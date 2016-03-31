@@ -3,181 +3,108 @@ package com.pedrogomez.renderers;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.pedrogomez.renderers.exception.NeedsPrototypesException;
-import com.pedrogomez.renderers.exception.NullContentException;
-import com.pedrogomez.renderers.exception.NullLayoutInflaterException;
-import com.pedrogomez.renderers.exception.NullParentException;
-import com.pedrogomez.renderers.exception.NullPrototypeClassException;
-import java.util.LinkedList;
-import java.util.List;
+import com.pedrogomez.renderers.exception.PrototypeNotFoundException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 /**
  * Test class created to check the correct behaviour of RendererBuilder
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
+@SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored", "ConstantConditions"})
 public class RendererBuilderTest {
 
-  private ObjectRendererBuilder rendererBuilder;
+    @Mock
+    private View mockedConvertView;
+    @Mock
+    private ViewGroup mockedParent;
+    @Mock
+    private LayoutInflater mockedLayoutInflater;
+    @Mock
+    private Object mockedContent;
+    @Mock
+    private View mockedRendererView;
 
-  private List<Renderer<Object>> prototypes;
-  private ObjectRenderer objectRenderer;
-  private SubObjectRenderer subObjectRenderer;
+    @Before
+    public void setUp() {
+        initializeMocks();
+        initializePrototypes();
+    }
 
-  @Mock private View mockedConvertView;
-  @Mock private ViewGroup mockedParent;
-  @Mock private LayoutInflater mockedLayoutInflater;
-  @Mock private Object mockedContent;
-  @Mock private View mockedRendererdView;
+    @Test(expected = NeedsPrototypesException.class)
+    public void shouldThrowNeedsPrototypeExceptionIfPrototypesIsNull() {
+        new ObjectRendererBuilder(null);
+    }
 
-  @Before public void setUp() {
-    initializeMocks();
-    initializePrototypes();
-    initializeRendererBuilder();
-  }
+    @Test(expected = NeedsPrototypesException.class)
+    public void shouldNotAcceptNullPrototypes() {
+        RendererBuilder rendererBuilder = new RendererBuilder();
 
-  @Test(expected = NeedsPrototypesException.class)
-  public void shouldThrowNeedsPrototypeExceptionIfPrototypesIsNull() {
-    rendererBuilder = new ObjectRendererBuilder(null);
-  }
+        rendererBuilder.withPrototypes(null);
+    }
 
-  @Test(expected = NullContentException.class)
-  public void shouldThrowNullContentExceptionIfBuildRendererWithoutContent() {
-    buildRenderer(null, mockedConvertView, mockedParent, mockedLayoutInflater);
-  }
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldNotAcceptNullKeysBindingAPrototype() {
+        RendererBuilder rendererBuilder = new RendererBuilder();
 
-  @Test(expected = NullParentException.class)
-  public void shouldThrowNullParentExceptionIfBuildRendererWithoutParent() {
-    buildRenderer(mockedContent, mockedConvertView, null, mockedLayoutInflater);
-  }
+        rendererBuilder.bind(null, new ObjectRenderer());
+    }
 
-  @Test(expected = NullPrototypeClassException.class)
-  public void
-  shouldThrowNullPrototypeClassExceptionIfRendererBuilderImplementationReturnsNullPrototypeClassAndGetItemViewType() {
-    when(rendererBuilder.getPrototypeClass(mockedContent)).thenReturn(null);
+    @Test
+    public void shouldAddPrototypeAndConfigureRendererBinding() {
+        RendererBuilder rendererBuilder = new RendererBuilder();
 
-    buildRenderer(mockedContent, mockedConvertView, mockedParent, mockedLayoutInflater);
+        rendererBuilder.bind(Object.class, new ObjectRenderer());
 
-    rendererBuilder.getItemViewType(mockedContent);
-  }
+        assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
+    }
 
-  @Test(expected = NullPrototypeClassException.class)
-  public void
-  shouldThrowNullPrototypeClassExceptionIfRendererBuilderImplementationReturnsNullPrototypeClassAndBuildOneRenderer() {
-    when(rendererBuilder.getPrototypeClass(mockedContent)).thenReturn(null);
+    @Test
+    public void shouldAddPrototypeAndConfigureRendererBindingForType() {
+        int type = 1;
+        RendererBuilder rendererBuilder = new RendererBuilder();
 
-    buildRenderer(mockedContent, mockedConvertView, mockedParent, mockedLayoutInflater);
+        rendererBuilder.bind(type, new ObjectRenderer());
 
-    rendererBuilder.build();
-  }
+        assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(
+                new RendererContent<>(new Object(), type)));
+    }
 
-  @Test(expected = NullLayoutInflaterException.class)
-  public void shouldThrowNullParentExceptionIfBuildARendererWithoutLayoutInflater() {
+    @Test(expected = PrototypeNotFoundException.class)
+    public void shouldFailForWrongType() {
+        int type = 1;
+        int anotherType = 2;
+        RendererBuilder rendererBuilder = new RendererBuilder();
 
-    buildRenderer(mockedContent, mockedConvertView, mockedParent, null);
-  }
+        rendererBuilder.bind(type, new ObjectRenderer());
+        rendererBuilder.bind(anotherType, new ObjectRenderer());
 
-  @Test public void shouldReturnCreatedRenderer() {
-    when(rendererBuilder.getPrototypeClass(mockedContent)).thenReturn(ObjectRenderer.class);
+        rendererBuilder.getPrototypeClass(new RendererContent<>(new Object(), -1));
+    }
 
-    Renderer<Object> renderer =
-        buildRenderer(mockedContent, null, mockedParent, mockedLayoutInflater);
+    @Test
+    public void shouldAddPrototyeAndConfigureBindingOnConstruction() {
+        RendererBuilder rendererBuilder = new RendererBuilder(new ObjectRenderer());
 
-    assertEquals(objectRenderer.getClass(), renderer.getClass());
-  }
+        assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
+    }
 
-  @Test public void shouldReturnRecycledRenderer() {
-    when(rendererBuilder.getPrototypeClass(mockedContent)).thenReturn(ObjectRenderer.class);
-    when(mockedConvertView.getTag()).thenReturn(objectRenderer);
+    private void initializeMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
-    Renderer<Object> renderer =
-        buildRenderer(mockedContent, mockedConvertView, mockedParent, mockedLayoutInflater);
-
-    assertEquals(objectRenderer, renderer);
-  }
-
-  @Test public void shouldCreateRendererEvenIfTagInConvertViewIsNotNull() {
-    when(rendererBuilder.getPrototypeClass(mockedContent)).thenReturn(ObjectRenderer.class);
-    when(mockedConvertView.getTag()).thenReturn(subObjectRenderer);
-
-    Renderer<Object> renderer =
-        buildRenderer(mockedContent, mockedConvertView, mockedParent, mockedLayoutInflater);
-
-    assertEquals(objectRenderer.getClass(), renderer.getClass());
-  }
-
-  @Test public void shouldReturnPrototypeSizeOnGetViewTypeCount() {
-    assertEquals(prototypes.size(), rendererBuilder.getViewTypeCount());
-  }
-
-  @Test(expected = NeedsPrototypesException.class) public void shouldNotAcceptNullPrototypes() {
-    RendererBuilder<Object> rendererBuilder = new RendererBuilder<Object>();
-
-    rendererBuilder.withPrototypes(null);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void shouldNotAcceptNullKeysBindingAPrototype() {
-    RendererBuilder<Object> rendererBuilder = new RendererBuilder<Object>();
-
-    rendererBuilder.bind(null, new ObjectRenderer());
-  }
-
-  @Test public void shouldAddPrototypeAndConfigureRendererBinding() {
-    RendererBuilder<Object> rendererBuilder = new RendererBuilder<Object>();
-
-    rendererBuilder.bind(Object.class, new ObjectRenderer());
-
-    assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
-  }
-
-  @Test public void shouldAddPrototypeAndConfigureBindingByClass() {
-    RendererBuilder<Object> rendererBuilder = new RendererBuilder<Object>();
-
-    rendererBuilder.withPrototype(new ObjectRenderer()).bind(Object.class, ObjectRenderer.class);
-
-    assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
-  }
-
-  @Test public void shouldAddPrototyeAndconfigureBindingOnConstruction() {
-    RendererBuilder<Object> rendererBuilder = new RendererBuilder<Object>(new ObjectRenderer());
-
-    assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
-  }
-
-  private void initializeMocks() {
-    MockitoAnnotations.initMocks(this);
-  }
-
-  private void initializePrototypes() {
-    prototypes = new LinkedList<Renderer<Object>>();
-    objectRenderer = new ObjectRenderer();
-    objectRenderer.setView(mockedRendererdView);
-    subObjectRenderer = new SubObjectRenderer();
-    subObjectRenderer.setView(mockedRendererdView);
-    prototypes.add(objectRenderer);
-    prototypes.add(subObjectRenderer);
-  }
-
-  private void initializeRendererBuilder() {
-    rendererBuilder = new ObjectRendererBuilder(prototypes);
-    rendererBuilder = spy(rendererBuilder);
-  }
-
-  private Renderer<Object> buildRenderer(Object content, View convertView, ViewGroup parent,
-      LayoutInflater layoutInflater) {
-    rendererBuilder.withContent(content);
-    rendererBuilder.withParent(parent);
-    rendererBuilder.withLayoutInflater(layoutInflater);
-    rendererBuilder.withConvertView(convertView);
-    return rendererBuilder.build();
-  }
+    private void initializePrototypes() {
+        ObjectRenderer objectRenderer = new ObjectRenderer();
+        objectRenderer.setView(mockedRendererView);
+        SubObjectRenderer subObjectRenderer = new SubObjectRenderer();
+        subObjectRenderer.setView(mockedRendererView);
+    }
 }

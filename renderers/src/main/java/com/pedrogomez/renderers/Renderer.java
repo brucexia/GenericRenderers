@@ -16,11 +16,14 @@
 package com.pedrogomez.renderers;
 
 import android.content.Context;
-import android.util.Log;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.pedrogomez.renderers.exception.NotInflateViewException;
+
+import java.util.List;
 
 /**
  * Core class in this library. Base class created to work as a root ViewHolder in the classic
@@ -38,119 +41,121 @@ import com.pedrogomez.renderers.exception.NotInflateViewException;
  */
 public abstract class Renderer<T> implements Cloneable {
 
-  private View rootView;
-  private T content;
+    private View rootView;
+    private T content;
 
-  /**
-   * Method called when the renderer is going to be created. This method has the responsibility of
-   * inflate the xml layout using the layoutInflater and the parent ViewGroup, set itself to the
-   * tag and call setUpView and hookListeners methods.
-   *
-   * @param content to render. If you are using Renderers with RecyclerView widget the content will
-   * be null in this method.
-   * @param layoutInflater used to inflate the view.
-   * @param parent used to inflate the view.
-   */
-  public void onCreate(T content, LayoutInflater layoutInflater, ViewGroup parent) {
-    this.content = content;
-    this.rootView = inflate(layoutInflater, parent);
-    if (rootView == null) {
-      throw new NotInflateViewException(
-          "Renderer instances have to return a not null view in inflateView method");
+    /**
+     * Method called when the renderer is going to be created. This method has the responsibility of
+     * inflate the xml layout using the layoutInflater and the parent ViewGroup and call setUpView and
+     * hookListeners methods.
+     *
+     * @param content to render. If you are using Renderers with RecyclerView widget the content will
+     * be null in this method.
+     * @param layoutInflater used to inflate the view.
+     * @param parent used to inflate the view.
+     */
+    public void onCreate(@Nullable T content, LayoutInflater layoutInflater, ViewGroup parent) {
+        this.content = content;
+        rootView = inflate(layoutInflater, parent);
+        if (rootView == null) {
+            throw new NotInflateViewException(
+                  "Renderer instances have to return a not null view in inflateView method");
+        }
+        setUpView(rootView);
+        hookListeners(rootView);
     }
-    this.rootView.setTag(this);
-    setUpView(rootView);
-    hookListeners(rootView);
-  }
 
-  /**
-   * Method called when the Renderer has been recycled. This method has the responsibility of
-   * update the content stored in the renderer.
-   *
-   * @param content to render.
-   */
-  public void onRecycle(T content) {
-    this.content = content;
-  }
-
-  /**
-   * Method to access the root view rendered in the Renderer.
-   *
-   * @return top view in the view hierarchy of one Renderer.
-   */
-  public View getRootView() {
-    return rootView;
-  }
-
-  /**
-   * Method to access to the current Renderer Context.
-   *
-   * @return the context associated to the root view or null if the root view has not been
-   * initialized.
-   */
-  protected Context getContext() {
-    return getRootView() != null ? getRootView().getContext() : null;
-  }
-
-  /**
-   * @return the content stored in the Renderer.
-   */
-  protected final T getContent() {
-    return content;
-  }
-
-  /**
-   * Configures the content stored in the Renderer.
-   *
-   * @param content associated to the Renderer instance.
-   */
-  protected void setContent(T content) {
-    this.content = content;
-  }
-
-  /**
-   * Map all the widgets from the rootView to Renderer members.
-   *
-   * @param rootView inflated using previously.
-   */
-  protected abstract void setUpView(View rootView);
-
-  /**
-   * Set all the listeners to members mapped in setUpView method.
-   *
-   * @param rootView inflated using previously.
-   */
-  protected abstract void hookListeners(View rootView);
-
-  /**
-   * Inflate renderer layout. The view inflated can't be null. If this method returns a null view a
-   * NotInflateViewException will be thrown.
-   *
-   * @param inflater LayoutInflater service to inflate.
-   * @param parent view group associated to the current Renderer instance.
-   * @return View with the inflated layout.
-   */
-  protected abstract View inflate(LayoutInflater inflater, ViewGroup parent);
-
-  /**
-   * Method where the presentation logic algorithm have to be declared or implemented.
-   */
-  public abstract void render();
-
-  /**
-   * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
-   * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
-   * method in Renderer subtypes.
-   *
-   * @return a copy of the current renderer.
-   */
-  Renderer copy() {
-    Renderer copy = null;
-    try {
-      copy = (Renderer) this.clone();
-    } catch (CloneNotSupportedException e) {
-      Log.e("Renderer", "All your renderers should be clonables.");
+    /**
+     * Method called when the Renderer has been recycled. This method has the responsibility of
+     * update the content stored in the renderer.
+     *
+     * @param content to render.
+     */
+    public void onRecycle(T content) {
+        this.content = content;
     }
-    return copy;
-  }
+
+    /**
+     * Method to access the root view rendered in the Renderer.
+     *
+     * @return top view in the view hierarchy of one Renderer.
+     */
+    public View getRootView() {
+        return rootView;
+    }
+
+    /**
+     * Method to access to the current Renderer Context.
+     *
+     * @return the context associated to the root view or null if the root view has not been
+     * initialized.
+     */
+    @Nullable
+    protected Context getContext() {
+        return rootView != null ? rootView.getContext() : null;
+    }
+
+    /**
+     * @return the content stored in the Renderer.
+     */
+    protected final T getContent() {
+        return content;
+    }
+
+    /**
+     * Configures the content stored in the Renderer.
+     *
+     * @param content associated to the Renderer instance.
+     */
+    public void setContent(T content) {
+        this.content = content;
+    }
+
+    /**
+     * Inflate renderer layout. The view inflated can't be null. If this method returns a null view a
+     * NotInflateViewException will be thrown.
+     * <p />
+     * <b>Please note that {@link #getContext()} will return null at this point.</b>
+     *
+     * @param inflater LayoutInflater service to inflate.
+     * @param parent view group associated to the current Renderer instance.
+     * @return View with the inflated layout.
+     */
+    protected abstract View inflate(LayoutInflater inflater, ViewGroup parent);
+
+    /**
+     * Map all the widgets from the rootView to Renderer members.
+     *
+     * @param rootView inflated using previously.
+     */
+    protected void setUpView(View rootView) { }
+
+    /**
+     * Set all the listeners to members mapped in setUpView method.
+     *
+     * @param rootView inflated using previously.
+     */
+    protected  void hookListeners(View rootView) { }
+
+    /**
+     * Method where the presentation logic algorithm have to be declared or implemented.
+     * @param payloads Extra payloads for fine-grain rendering.
+     */
+    public abstract void render(List<Object> payloads);
+
+    /**
+     * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
+     * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
+     * method in Renderer subtypes.
+     *
+     * @return a copy of the current renderer.
+     */
+    Renderer<T> copy() {
+        try {
+            //noinspection unchecked
+            return (Renderer<T>) clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("All your renderers should be clonables.");
+        }
+    }
 }

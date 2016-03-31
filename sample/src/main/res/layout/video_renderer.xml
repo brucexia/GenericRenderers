@@ -25,14 +25,6 @@
       android:id="@+id/iv_play"
       style="@style/AppTheme.Video.Play"/>
 
-  <ImageView
-      android:id="@+id/iv_marker"
-      style="@style/AppTheme.Video.Marker"/>
-
-  <TextView
-      android:id="@+id/tv_label"
-      style="@style/AppTheme.Video.Label"/>
-
   <TextView
       android:id="@+id/tv_title"
       style="@style/AppTheme.Video.Title"/>

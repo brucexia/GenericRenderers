@@ -15,19 +15,23 @@
  */
 package com.pedrogomez.renderers;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+
 import com.pedrogomez.renderers.exception.NullRendererBuiltException;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * BaseAdapter created to work RendererBuilders and Renderer instances. Other adapters have to use
- * this one to show information into ListView widgets.
+ * RecyclerView.Adapter extension created to work RendererBuilders and Renderer instances. Other
+ * adapters have to use this one to show information into RecyclerView widgets.
  *
  * This class is the heart of this library. It's used to avoid the library users declare a new
- * renderer each time they have to show information into a ListView.
+ * renderer each time they have to show information into a RecyclerView.
  *
  * RendererAdapter has to be constructed with a LayoutInflater to inflate views, one
  * RendererBuilder to provide Renderer to RendererAdapter and one AdapteeCollection to
@@ -35,146 +39,159 @@ import java.util.Collection;
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
-public class RendererAdapter<T> extends BaseAdapter {
+@SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
+public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder> {
 
-  private final RendererBuilder<T> rendererBuilder;
-  private final AdapteeCollection<T> collection;
+    private final RendererBuilder<T> rendererBuilder;
+    private final List<T> collection;
 
-  public RendererAdapter(RendererBuilder rendererBuilder) {
-    this(rendererBuilder, new ListAdapteeCollection<T>());
-  }
-
-  public RendererAdapter(RendererBuilder rendererBuilder, AdapteeCollection<T> collection) {
-    this.rendererBuilder = rendererBuilder;
-    this.collection = collection;
-  }
-
-  @Override public int getCount() {
-    return collection.size();
-  }
-
-  @Override public T getItem(int position) {
-    return collection.get(position);
-  }
-
-  @Override public long getItemId(int position) {
-    return position;
-  }
-
-  /**
-   * Main method of RendererAdapter. This method has the responsibility of update the
-   * RendererBuilder values and create or recycle a new Renderer. Once the renderer has been
-   * obtained the RendereBuilder will call the render method in the renderer and will return the
-   * Renderer root view to the ListView.
-   *
-   * If rRendererBuilder returns a null Renderer this method will throw a
-   * NullRendererBuiltException.
-   *
-   * @param position to render.
-   * @param convertView to use to recycle.
-   * @param parent used to inflate views.
-   * @return view rendered.
-   */
-  @Override public View getView(int position, View convertView, ViewGroup parent) {
-    T content = getItem(position);
-    rendererBuilder.withContent(content);
-    rendererBuilder.withConvertView(convertView);
-    rendererBuilder.withParent(parent);
-    rendererBuilder.withLayoutInflater(LayoutInflater.from(parent.getContext()));
-    Renderer<T> renderer = rendererBuilder.build();
-    if (renderer == null) {
-      throw new NullRendererBuiltException("RendererBuilder have to return a not null Renderer");
+    public RendererAdapter(RendererBuilder rendererBuilder) {
+        this(rendererBuilder, new ArrayList());
     }
-    updateRendererExtraValues(content, renderer, position);
-    renderer.render();
-    return renderer.getRootView();
-  }
 
-  /**
-   * Indicate to the ListView the type of Renderer used to one position using a numeric value.
-   *
-   * @param position to analyze.
-   * @return the id associated to the Renderer used to render the content given a position.
-   */
-  @Override public int getItemViewType(int position) {
-    T content = getItem(position);
-    return rendererBuilder.getItemViewType(content);
-  }
+    public RendererAdapter(RendererBuilder rendererBuilder, List collection) {
+        this.rendererBuilder = rendererBuilder;
+        this.collection = collection;
+    }
 
-  /**
-   * Indicate to the ListView the number of different how many Renderer implementations are in the
-   * RendererBuilder ready to use.
-   *
-   * @return amount of different Renderer types.
-   */
-  @Override public int getViewTypeCount() {
-    return rendererBuilder.getViewTypeCount();
-  }
+    @Override
+    public int getItemCount() {
+        return collection.size();
+    }
 
-  /**
-   * Add an element to the AdapteeCollection.
-   *
-   * @param element to add.
-   */
-  public void add(T element) {
-    collection.add(element);
-  }
+    public T getItem(int position) {
+        return collection.get(position);
+    }
 
-  /**
-   * Remove an element from the AdapteeCollection.
-   *
-   * @param element to remove.
-   */
-  public void remove(Object element) {
-    collection.remove(element);
-  }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
-  /**
-   * Add a Collection of elements to the AdapteeCollection.
-   *
-   * @param elements to add.
-   */
-  public void addAll(Collection<? extends T> elements) {
-    collection.addAll(elements);
-  }
+    /**
+     * Indicate to the RecyclerView the type of Renderer used to one position using a numeric value.
+     *
+     * @param position to analyze.
+     * @return the id associated to the Renderer used to render the content given a position.
+     */
+    @Override
+    public int getItemViewType(int position) {
+        T content = getItem(position);
+        return rendererBuilder.getItemViewType(content);
+    }
 
-  /**
-   * Remove a Collection of elements to the AdapteeCollection.
-   *
-   * @param elements to remove.
-   */
-  public void removeAll(Collection<?> elements) {
-    collection.removeAll(elements);
-  }
+    /**
+     * One of the two main methods in this class. Creates a RendererViewHolder instance with a
+     * Renderer inside ready to be used. The RendererBuilder to create a RendererViewHolder using the
+     * information given as parameter.
+     *
+     * @param viewGroup used to create the ViewHolder.
+     * @param viewType associated to the renderer.
+     * @return ViewHolder extension with the Renderer it has to use inside.
+     */
+    @Override
+    public RendererViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        rendererBuilder.withParent(viewGroup);
+        rendererBuilder.withLayoutInflater(LayoutInflater.from(viewGroup.getContext()));
+        rendererBuilder.withViewType(viewType);
+        RendererViewHolder viewHolder = rendererBuilder.buildRendererViewHolder();
+        if (viewHolder == null) {
+            throw new NullRendererBuiltException("RendererBuilder have to return a not null viewHolder");
+        }
+        return viewHolder;
+    }
 
-  /**
-   * Remove all elements inside the AdapteeCollection.
-   */
-  public void clear() {
-    collection.clear();
-  }
+    /**
+     * Given a RendererViewHolder passed as argument and a position renders the view using the
+     * Renderer previously stored into the RendererViewHolder.
+     *
+     * @param viewHolder with a Renderer class inside.
+     * @param position to render.
+     */
+    @Override
+    public void onBindViewHolder(RendererViewHolder viewHolder, int position) {
+        onBindViewHolder(viewHolder, position, Collections.EMPTY_LIST);
+    }
 
-  /**
-   * Allows the client code to access the AdapteeCollection from subtypes of RendererAdapter.
-   *
-   * @return collection used in the adapter as the adaptee class.
-   */
-  protected AdapteeCollection<T> getCollection() {
-    return collection;
-  }
+    @Override
+    public void onBindViewHolder(RendererViewHolder viewHolder, int position, List<Object> payloads) {
+        T content = getItem(position);
+        Renderer renderer = viewHolder.getRenderer();
+        if (renderer == null) {
+            throw new NullRendererBuiltException("RendererBuilder have to return a not null renderer");
+        }
+        renderer.setContent(content);
+        updateRendererExtraValues(content, renderer, position);
+        renderer.render(payloads);
+    }
 
-  /**
-   * Empty implementation created to allow the client code to extend this class without override
-   * getView method.
-   *
-   * This method is called before render the Renderer and can be used in RendererAdapter extension
-   * to add extra info to the renderer created like the position in the ListView/RecyclerView.
-   *
-   * @param content to be rendered.
-   * @param renderer to be used to paint the content.
-   * @param position of the content.
-   */
-  protected void updateRendererExtraValues(T content, Renderer<T> renderer, int position) {
-    //Empty implementation
-  }
+    /**
+     * Add an element to the AdapteeCollection.
+     *
+     * @param element to add.
+     * @return if the element has been added.
+     */
+    public boolean add(Object element) {
+        return collection.add((T) element);
+    }
+
+    /**
+     * Remove an element from the AdapteeCollection.
+     *
+     * @param element to remove.
+     * @return if the element has been removed.
+     */
+    public boolean remove(Object element) {
+        return collection.remove(element);
+    }
+
+    /**
+     * Add a Collection of elements to the AdapteeCollection.
+     *
+     * @param elements to add.
+     * @return if the elements have been added.
+     */
+    public boolean addAll(Collection elements) {
+        return collection.addAll(elements);
+    }
+
+    /**
+     * Remove a Collection of elements to the AdapteeCollection.
+     *
+     * @param elements to remove.
+     * @return if the elements have been removed.
+     */
+    public boolean removeAll(Collection<?> elements) {
+        return collection.removeAll(elements);
+    }
+
+    /**
+     * Remove all elements inside the AdapteeCollection.
+     */
+    public void clear() {
+        collection.clear();
+    }
+
+    /**
+     * Allows the client code to access the AdapteeCollection from subtypes of RendererAdapter.
+     *
+     * @return collection used in the adapter as the adaptee class.
+     */
+    public List<T> getCollection() {
+        return collection;
+    }
+
+    /**
+     * Empty implementation created to allow the client code to extend this class without override
+     * getView method.
+     *
+     * This method is called before render the Renderer and can be used in RendererAdapter extension
+     * to add extra info to the renderer created like the position in the ListView/RecyclerView.
+     *
+     * @param content to be rendered.
+     * @param renderer to be used to paint the content.
+     * @param position of the content.
+     */
+    @SuppressWarnings("UnusedParameters")
+    protected void updateRendererExtraValues(T content, Renderer renderer, int position) { }
 }

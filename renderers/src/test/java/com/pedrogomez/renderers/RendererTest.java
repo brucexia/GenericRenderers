@@ -3,7 +3,9 @@ package com.pedrogomez.renderers;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.pedrogomez.renderers.exception.NotInflateViewException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -22,94 +24,97 @@ import static org.mockito.Mockito.when;
 
 public class RendererTest {
 
-  @Spy private ObjectRenderer renderer;
+    @Spy
+    private ObjectRenderer renderer;
 
-  @Mock private Object mockedContent;
-  @Mock private LayoutInflater mockedLayoutInflater;
-  @Mock private ViewGroup mockedParent;
-  @Mock private View mockedView;
+    @Mock
+    private Object mockedContent;
+    @Mock
+    private LayoutInflater mockedLayoutInflater;
+    @Mock
+    private ViewGroup mockedParent;
+    @Mock
+    private View mockedView;
 
-  @Before public void setUp() {
-    initializeRenderer();
-    initializeMocks();
-  }
+    @Before
+    public void setUp() {
+        initializeRenderer();
+        initializeMocks();
+    }
 
-  @Test public void shouldKeepTheContentAfterOnCreateCall() {
-    givenARendererInflatingView(mockedView);
+    @Test
+    public void shouldKeepTheContentAfterOnCreateCall() {
+        givenARendererInflatingView(mockedView);
 
-    onCreateRenderer();
+        onCreateRenderer();
 
-    assertEquals(mockedContent, renderer.getContent());
-  }
+        assertEquals(mockedContent, renderer.getContent());
+    }
 
-  @Test public void shouldInflateViewUsingLayoutInflaterAndParentAfterOnCreateCall() {
-    givenARendererInflatingView(mockedView);
+    @Test
+    public void shouldInflateViewUsingLayoutInflaterAndParentAfterOnCreateCall() {
+        givenARendererInflatingView(mockedView);
 
-    onCreateRenderer();
+        onCreateRenderer();
 
-    verify(renderer).inflate(mockedLayoutInflater, mockedParent);
-  }
+        verify(renderer).inflate(mockedLayoutInflater, mockedParent);
+    }
 
-  @Test(expected = NotInflateViewException.class)
-  public void shouldThrowExceptionIfInflateReturnsAnEmptyViewAfterOnCreateCall() {
-    givenArendererInflatingANullView();
+    @Test(expected = NotInflateViewException.class)
+    public void shouldThrowExceptionIfInflateReturnsAnEmptyViewAfterOnCreateCall() {
+        givenArendererInflatingANullView();
 
-    onCreateRenderer();
-  }
+        onCreateRenderer();
+    }
 
-  @Test public void shouldAssociateTheRendererToTheRootViewTagAfterOnCreateCall() {
-    givenARendererInflatingView(mockedView);
+    @Test
+    public void shouldSetUpViewWithTheInflatedViewAfterOnCreateCall() {
+        givenARendererInflatingView(mockedView);
 
-    onCreateRenderer();
+        onCreateRenderer();
 
-    verify(mockedView).setTag(renderer);
-  }
+        verify(renderer).setUpView(mockedView);
+    }
 
-  @Test public void shouldSetUpViewWithTheInflatedViewAfterOnCreateCall() {
-    givenARendererInflatingView(mockedView);
+    @Test
+    public void shouldHookListenersViewWithTheInflatedViewAfterOnCreateCall() {
+        givenARendererInflatingView(mockedView);
 
-    onCreateRenderer();
+        onCreateRenderer();
 
-    verify(renderer).setUpView(mockedView);
-  }
+        verify(renderer).hookListeners(mockedView);
+    }
 
-  @Test public void shouldHookListenersViewWithTheInflatedViewAfterOnCreateCall() {
-    givenARendererInflatingView(mockedView);
+    @Test
+    public void shouldKeepTheContentAfterOnRecycleCall() {
+        givenARendererInflatingView(mockedView);
 
-    onCreateRenderer();
+        onRecycleRenderer();
 
-    verify(renderer).hookListeners(mockedView);
-  }
+        assertEquals(mockedContent, renderer.getContent());
+    }
 
-  @Test public void shouldKeepTheContentAfterOnRecycleCall() {
-    givenARendererInflatingView(mockedView);
+    private void initializeRenderer() {
+        renderer = new ObjectRenderer();
+    }
 
-    onRecycleRenderer();
+    private void initializeMocks() {
+        MockitoAnnotations.initMocks(this);
+    }
 
-    assertEquals(mockedContent, renderer.getContent());
-  }
+    private void onCreateRenderer() {
+        renderer.onCreate(mockedContent, mockedLayoutInflater, mockedParent);
+    }
 
-  private void initializeRenderer() {
-    renderer = new ObjectRenderer();
-  }
+    private void onRecycleRenderer() {
+        renderer.onRecycle(mockedContent);
+    }
 
-  private void initializeMocks() {
-    MockitoAnnotations.initMocks(this);
-  }
+    private void givenArendererInflatingANullView() {
+        givenARendererInflatingView(null);
+    }
 
-  private void onCreateRenderer() {
-    renderer.onCreate(mockedContent, mockedLayoutInflater, mockedParent);
-  }
-
-  private void onRecycleRenderer() {
-    renderer.onRecycle(mockedContent);
-  }
-
-  private void givenArendererInflatingANullView() {
-    givenARendererInflatingView(null);
-  }
-
-  private void givenARendererInflatingView(View view) {
-    when(renderer.inflate(mockedLayoutInflater, mockedParent)).thenReturn(view);
-  }
+    private void givenARendererInflatingView(View view) {
+        when(renderer.inflate(mockedLayoutInflater, mockedParent)).thenReturn(view);
+    }
 }

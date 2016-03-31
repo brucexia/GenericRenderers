@@ -8,7 +8,7 @@ package com.pedrogomez.renderers.exception;
  */
 public class PrototypeNotFoundException extends RendererException {
 
-  public PrototypeNotFoundException(String detailMessage) {
-    super(detailMessage);
-  }
+    public PrototypeNotFoundException(String detailMessage) {
+        super(detailMessage);
+    }
 }

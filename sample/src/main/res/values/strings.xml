@@ -16,12 +16,13 @@
   -->
 <resources>
 
-  <string name="app_name">Renderers</string>
+  <string name="app_name">GenericRenderers</string>
   <string name="favorite_label">Favorite</string>
   <string name="like_label">Like</string>
   <string name="dislike_label">Dislike</string>
   <string name="live_label">Live</string>
-  <string name="open_lv_sample">Open ListView sample</string>
-  <string name="open_rv_sample">Open RecyclerView sample</string>
+  <string name="open_rv_simple">Open RecyclerView simple</string>
+  <string name="open_rv_advanced">Open RecyclerView advanced</string>
+  <string name="open_rv_complex">Open RecyclerView complex</string>
 
 </resources>

@@ -23,7 +23,7 @@ package com.pedrogomez.renderers.exception;
  */
 public class NullContentException extends RendererException {
 
-  public NullContentException(String detailMessage) {
-    super(detailMessage);
-  }
+    public NullContentException(String detailMessage) {
+        super(detailMessage);
+    }
 }

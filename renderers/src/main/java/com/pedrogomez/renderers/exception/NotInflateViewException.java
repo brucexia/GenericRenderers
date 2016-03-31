@@ -23,7 +23,7 @@ package com.pedrogomez.renderers.exception;
  */
 public class NotInflateViewException extends RendererException {
 
-  public NotInflateViewException(String detailMessage) {
-    super(detailMessage);
-  }
+    public NotInflateViewException(String detailMessage) {
+        super(detailMessage);
+    }
 }

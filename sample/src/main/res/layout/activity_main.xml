@@ -14,29 +14,34 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/AppTheme.RootView">
+<RelativeLayout style="@style/AppTheme.RootView"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <LinearLayout
-      android:orientation="vertical"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_centerInParent="true"
-      android:gravity="center"
-      >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
 
-  <Button
-      android:id="@+id/bt_open_lv_sample"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/open_lv_sample"/>
+        <Button
+            android:id="@+id/bt_open_rv_simple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_rv_simple" />
 
-  <Button
-      android:id="@+id/bt_open_rv_sample"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/open_rv_sample"/>
+        <Button
+            android:id="@+id/bt_open_rv_advanced"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_rv_advanced" />
 
-  </LinearLayout>
+        <Button
+            android:id="@+id/bt_open_rv_complex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_rv_complex" />
+
+    </LinearLayout>
 
 </RelativeLayout>

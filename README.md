@@ -1,4 +1,4 @@
-GenericRenderers [![Build Status](https://travis-ci.org/Shyish/GenericRenderers.svg?branch=master)](https://travis-ci.org/Shyish/GenericRenderers) [![JitPack](https://jitpack.io/v/Shyish/GenericRenderers.svg)](https://jitpack.io/#Shyish/GenericRenderers)
+GenericRenderers [![Build Status](https://travis-ci.org/Shyish/GenericRenderers.svg?branch=master)](https://travis-ci.org/Shyish/GenericRenderers) [![JitPack](https://jitpack.io/v/Shyish/GenericRenderers.svg)](https://jitpack.io/#Shyish/GenericRenderers) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GenericRenderers-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3364)
 ===
 
 Based on [Renderers lib](https://github.com/pedrovgs/Renderers) made by [pedrovgs](https://github.com/pedrovgs)
@@ -78,7 +78,7 @@ RendererBuilder<Video> rendererBuilder = new RendererBuilder<>(new VideoRenderer
 recyclerView.setAdapter(new RendererAdapter<>(rendererBuilder, videoCollection));
 ```
 
-![That's it!](http://raw.github.com/Shyish/GenericRenderers/master/art/Screenshot_demo_1.png)
+![That's it!](./art/screenshot_demo_1.jpg?raw=true)
 
 ### Advanced usage: multiple models
 
@@ -111,7 +111,7 @@ for (int i = 0, videoCollectionSize = videoCollection.size(); i < videoCollectio
 As you can see there's no problem in adding different types since the list in the adapter will be of type `Object`. In 
 case that you add a different type that doesn't have a Renderer associated with, an exception will be thrown.
 
-![Result](http://raw.github.com/Shyish/GenericRenderers/master/art/Screenshot_demo_2.png)
+![Result](./art/screenshot_demo_2.jpg?raw=true)
 
 ### More complex usage: multiple complex models
 
@@ -148,7 +148,7 @@ Of course we also need to modify the `SectionRenderer` to use a different type:
 public class SectionRenderer extends Renderer<RendererContent<String>>
 ```
 
-![Beautiful!](http://raw.github.com/Shyish/GenericRenderers/master/art/Screenshot_demo_3.png)
+![Beautiful!](./art/screenshot_demo_3.jpg?raw=true)
 
 INCLUDING IN YOUR PROJECT
 ---
@@ -163,7 +163,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.Shyish:GenericRenderers:3.0.0'
+        compile 'com.github.Shyish:GenericRenderers:1.0'
 }
 ```
 
@@ -180,10 +180,10 @@ Or declare it into your pom.xml
 <dependency>
     <groupId>com.github.Shyish</groupId>
     <artifactId>GenericRenderers</artifactId>
-    <version>3.0.0</version>
+    <version>1.0</version>
 </dependency>
 ```
 
 UPDATES
 ---
-* v3.0 Base version forked from Renderers lib.
+* v1.0 Base version.

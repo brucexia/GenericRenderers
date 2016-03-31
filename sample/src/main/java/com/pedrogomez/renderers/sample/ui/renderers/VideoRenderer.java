@@ -21,13 +21,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+
 import com.pedrogomez.renderers.Renderer;
 import com.pedrogomez.renderers.sample.R;
 import com.pedrogomez.renderers.sample.model.Video;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Abstract class that works as base renderer for Renderer<Video>. This class implements the main
@@ -35,99 +39,50 @@ import com.squareup.picasso.Picasso;
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
-public abstract class VideoRenderer extends Renderer<Video> {
+public class VideoRenderer extends Renderer<Video> {
 
-  @Bind(R.id.iv_thumbnail) ImageView thumbnail;
-  @Bind(R.id.tv_title) TextView title;
-  @Bind(R.id.iv_marker) ImageView marker;
-  @Bind(R.id.tv_label) TextView label;
+    @Bind(R.id.iv_thumbnail)
+    ImageView thumbnail;
+    @Bind(R.id.tv_title)
+    TextView title;
 
-  /**
-   * Inflate the main layout used to render videos in the list view.
-   *
-   * @param inflater LayoutInflater service to inflate.
-   * @param parent ViewGroup used to inflate xml.
-   * @return view inflated.
-   */
-  @Override protected View inflate(LayoutInflater inflater, ViewGroup parent) {
-    View inflatedView = inflater.inflate(R.layout.video_renderer, parent, false);
+    /**
+     * Inflate the main layout used to render videos in the list view.
+     *
+     * @param inflater LayoutInflater service to inflate.
+     * @param parent ViewGroup used to inflate xml.
+     * @return view inflated.
+     */
+    @Override
+    protected View inflate(LayoutInflater inflater, ViewGroup parent) {
+        View inflatedView = inflater.inflate(R.layout.video_renderer, parent, false);
         /*
          * You don't have to use ButterKnife library to implement the mapping between your layout
          * and your widgets you can implement setUpView and hookListener methods declared in
          * Renderer<T> class.
          */
-    ButterKnife.bind(this, inflatedView);
-    return inflatedView;
-  }
+        ButterKnife.bind(this, inflatedView);
+        return inflatedView;
+    }
 
-  @OnClick(R.id.iv_thumbnail) void onVideoClicked() {
-    Video video = getContent();
-    Toast.makeText(getContext(), "Video clicked. Title = " + video.getTitle(), Toast.LENGTH_LONG)
-        .show();
-  }
+    @OnClick(R.id.iv_thumbnail)
+    void onVideoClicked() {
+        Video video = getContent();
+        Toast.makeText(getContext(), "Video clicked. Title = " + video.getTitle(), Toast.LENGTH_LONG).show();
+    }
 
-  /**
-   * Main render algorithm based on render the video thumbnail, render the title, render the marker
-   * and the label.
-   */
-  @Override public void render() {
-    Video video = getContent();
-    renderThumbnail(video);
-    renderTitle(video);
-    renderMarker(video);
-    renderLabel();
-  }
-
-  /**
-   * Use picasso to render the video thumbnail into the thumbnail widget using a temporal
-   * placeholder.
-   *
-   * @param video to get the rendered thumbnail.
-   */
-  private void renderThumbnail(Video video) {
-    Picasso.with(getContext()).cancelRequest(thumbnail);
-    Picasso.with(getContext())
-        .load(video.getThumbnail())
-        .placeholder(R.drawable.placeholder)
-        .into(thumbnail);
-  }
-
-  /**
-   * Render video title into the title widget.
-   *
-   * @param video to get the video title.
-   */
-  private void renderTitle(Video video) {
-    this.title.setText(video.getTitle());
-  }
-
-  protected TextView getLabel() {
-    return label;
-  }
-
-  protected ImageView getMarker() {
-    return marker;
-  }
-
-  protected abstract void renderLabel();
-
-  protected abstract void renderMarker(Video video);
-
-  /**
-   * Maps all the view elements from the xml declaration to members of this renderer.
-   */
-  @Override protected void setUpView(View rootView) {
-        /*
-         * Empty implementation substituted with the usage of ButterKnife library by Jake Wharton.
-         */
-  }
-
-  /**
-   * Insert external listeners in some widgets.
-   */
-  @Override protected void hookListeners(View rootView) {
-        /*
-         * Empty implementation substituted with the usage of ButterKnife library by Jake Wharton.
-         */
-  }
+    /**
+     * Main render algorithm based on render the video thumbnail, render the title, render the marker
+     * and the label.
+     */
+    @Override
+    public void render(List<Object> payloads) {
+        Video video = getContent();
+        Picasso.with(getContext()).cancelRequest(thumbnail);
+        Picasso.with(getContext())
+              .load(video.getThumbnail())
+              .placeholder(R.drawable.placeholder)
+              .into(thumbnail);
+        title.setText(video.getTitle());
+    }
 }

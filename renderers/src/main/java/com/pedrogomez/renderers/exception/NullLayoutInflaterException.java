@@ -24,7 +24,7 @@ package com.pedrogomez.renderers.exception;
  */
 public class NullLayoutInflaterException extends RendererException {
 
-  public NullLayoutInflaterException(String detailMessage) {
-    super(detailMessage);
-  }
+    public NullLayoutInflaterException(String detailMessage) {
+        super(detailMessage);
+    }
 }

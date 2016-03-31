@@ -4,6 +4,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.List;
+
 /**
  * Renderer created only for testing purposes.
  *
@@ -11,25 +13,18 @@ import android.view.ViewGroup;
  */
 public class ObjectRenderer extends Renderer<Object> {
 
-  private View view;
+    private View view;
 
-  @Override protected void setUpView(View rootView) {
+    @Override
+    protected View inflate(LayoutInflater inflater, ViewGroup parent) {
+        return view;
+    }
 
-  }
+    @Override
+    public void render(List<Object> payloads) {
+    }
 
-  @Override protected void hookListeners(View rootView) {
-
-  }
-
-  @Override protected View inflate(LayoutInflater inflater, ViewGroup parent) {
-    return view;
-  }
-
-  @Override public void render() {
-
-  }
-
-  public void setView(View view) {
-    this.view = view;
-  }
+    public void setView(View view) {
+        this.view = view;
+    }
 }

@@ -24,7 +24,7 @@ package com.pedrogomez.renderers.exception;
  */
 public class NeedsPrototypesException extends RendererException {
 
-  public NeedsPrototypesException(String detailMessage) {
-    super(detailMessage);
-  }
+    public NeedsPrototypesException(String detailMessage) {
+        super(detailMessage);
+    }
 }

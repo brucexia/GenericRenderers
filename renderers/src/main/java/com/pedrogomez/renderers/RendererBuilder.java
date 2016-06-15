@@ -223,7 +223,7 @@ public class RendererBuilder<T> {
         for (int i = 0, prototypesSize = prototypes.size(); i < prototypesSize; i++) {
             Renderer renderer = prototypes.get(i);
             if (renderer.getClass().equals(prototypeClass)) {
-                itemViewType = getPrototypeIndex(renderer);
+                itemViewType = i;
                 break;
             }
         }
@@ -232,24 +232,6 @@ public class RendererBuilder<T> {
                     + " prototype class not found in prototypes collection");
         }
         return itemViewType;
-    }
-
-    /**
-     * Return the index associated to the Renderer.
-     *
-     * @param renderer used to search in the prototypes collection.
-     * @return the prototype index associated to the renderer passed as argument.
-     */
-    private int getPrototypeIndex(Renderer renderer) {
-        int index = 0;
-        for (int i = 0, prototypesSize = prototypes.size(); i < prototypesSize; i++) {
-            Renderer prototype = prototypes.get(i);
-            if (prototype.getClass().equals(renderer.getClass())) {
-                break;
-            }
-            index++;
-        }
-        return index;
     }
 
     /**

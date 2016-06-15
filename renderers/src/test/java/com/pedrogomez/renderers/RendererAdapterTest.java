@@ -53,7 +53,8 @@ public class RendererAdapterTest {
     private static final int ANY_SIZE = 11;
     private static final int ANY_POSITION = 2;
     private static final Object ANY_OBJECT = new Object();
-    private static final Collection<Object> ANY_OBJECT_COLLECTION = new LinkedList<Object>();
+    private static final Object ANY_OTHER_OBJECT = new Object();
+    private static final Collection<Object> ANY_OBJECT_COLLECTION = new LinkedList<>();
     private static final int ANY_ITEM_VIEW_TYPE = 3;
 
     private RendererAdapter<Object> adapter;
@@ -145,6 +146,13 @@ public class RendererAdapterTest {
     }
 
     @Test
+    public void shouldAddElementAtPositionToAdapteeCollection() {
+        adapter.add(0, ANY_OBJECT);
+
+        verify(mockedCollection).add(0, ANY_OBJECT);
+    }
+
+    @Test
     public void shouldAddAllElementsToAdapteeCollection() {
         adapter.addAll(ANY_OBJECT_COLLECTION);
 
@@ -152,10 +160,24 @@ public class RendererAdapterTest {
     }
 
     @Test
+    public void shouldAddAllElementsAtPositionToAdapteeCollection() {
+        adapter.addAll(0, ANY_OBJECT_COLLECTION);
+
+        verify(mockedCollection).addAll(0, ANY_OBJECT_COLLECTION);
+    }
+
+    @Test
     public void shouldRemoveElementFromAdapteeCollection() {
         adapter.remove(ANY_OBJECT);
 
         verify(mockedCollection).remove(ANY_OBJECT);
+    }
+
+    @Test
+    public void shouldUpdateElementAtPositionFromAdapteeCollection() {
+        adapter.update(0, ANY_OBJECT);
+
+        verify(mockedCollection).set(0, ANY_OBJECT);
     }
 
     @Test
@@ -189,7 +211,7 @@ public class RendererAdapterTest {
 
         adapter.onBindViewHolder(mockedRendererViewHolder, ANY_POSITION);
 
-        verify(mockedRenderer).render(Collections.EMPTY_LIST);
+        verify(mockedRenderer).render(Collections.emptyList());
     }
 
     private void initializeMocks() {

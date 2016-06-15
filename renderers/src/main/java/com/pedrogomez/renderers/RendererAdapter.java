@@ -136,6 +136,28 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
     }
 
     /**
+     * Add an element to the AdapteeCollection.
+     *
+     * @param index the index at which to add the object.
+     * @param element to add.
+     * @return if the element has been added.
+     */
+    public void add(int index, Object element) {
+        collection.add(index, (T) element);
+    }
+
+    /**
+     * Updates an element to the AdapteeCollection.
+     *
+     * @param index the index at which to update the object.
+     * @param element the updated object.
+     * @return the updated element.
+     */
+    public T update(int index, Object element) {
+        return collection.set(index, (T) element);
+    }
+
+    /**
      * Remove an element from the AdapteeCollection.
      *
      * @param element to remove.
@@ -153,6 +175,17 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
      */
     public boolean addAll(Collection elements) {
         return collection.addAll(elements);
+    }
+
+    /**
+     * Add a Collection of elements to the AdapteeCollection.
+     *
+     * @param index the index at which to add the object.
+     * @param elements to add.
+     * @return if the elements have been added.
+     */
+    public boolean addAll(int index, Collection elements) {
+        return collection.addAll(index, elements);
     }
 
     /**

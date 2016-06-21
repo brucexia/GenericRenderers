@@ -1,4 +1,4 @@
-GenericRenderers [![Build Status](https://travis-ci.org/Shyish/GenericRenderers.svg?branch=master)](https://travis-ci.org/Shyish/GenericRenderers) [![JitPack](https://jitpack.io/v/Shyish/GenericRenderers.svg)](https://jitpack.io/#Shyish/GenericRenderers) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GenericRenderers-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3364)
+GenericRenderers [![Build Status](https://travis-ci.org/Shyish/GenericRenderers.svg?branch=master)](https://travis-ci.org/Shyish/GenericRenderers) [![JitPack](https://jitpack.io/v/Shyish/GenericRenderers.svg)](https://jitpack.io/#Shyish/GenericRenderers) [![codecov](https://codecov.io/gh/Shyish/GenericRenderers/branch/master/graph/badge.svg)](https://codecov.io/gh/Shyish/GenericRenderers) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GenericRenderers-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3364)
 ===
 
 Based on [Renderers lib](https://github.com/pedrovgs/Renderers) made by [pedrovgs](https://github.com/pedrovgs)

@@ -1,8 +1,10 @@
 language: android
+jdk: oraclejdk8
 
 android:
   components:
     - tools
+    - platform-tools
     - build-tools-23.0.3
     - android-23
     - extra-android-support
@@ -11,4 +13,7 @@ android:
 
 script: 
   - ./gradlew checkstyle build
+  - ./gradlew build jacocoTestReport assembleAndroidTest
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

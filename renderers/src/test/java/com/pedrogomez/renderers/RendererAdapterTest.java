@@ -53,7 +53,6 @@ public class RendererAdapterTest {
     private static final int ANY_SIZE = 11;
     private static final int ANY_POSITION = 2;
     private static final Object ANY_OBJECT = new Object();
-    private static final Object ANY_OTHER_OBJECT = new Object();
     private static final Collection<Object> ANY_OBJECT_COLLECTION = new LinkedList<>();
     private static final int ANY_ITEM_VIEW_TYPE = 3;
 
@@ -81,7 +80,7 @@ public class RendererAdapterTest {
     }
 
     @Test
-    public void shouldReturnTheAdapteeCollection() {
+    public void shouldReturnTheCollection() {
         assertEquals(mockedCollection, adapter.getCollection());
     }
 
@@ -139,59 +138,106 @@ public class RendererAdapterTest {
     }
 
     @Test
-    public void shouldAddElementToAdapteeCollection() {
-        adapter.add(ANY_OBJECT);
+    public void shouldAddElementToCollection() {
+        when(mockedCollection.size()).thenReturn(ANY_SIZE);
+        adapter.addAndNotify(ANY_OBJECT);
 
         verify(mockedCollection).add(ANY_OBJECT);
+        verify(adapter).notifyItemInserted(ANY_SIZE);
     }
 
     @Test
-    public void shouldAddElementAtPositionToAdapteeCollection() {
-        adapter.add(0, ANY_OBJECT);
+    public void shouldAddElementAtPositionToCollection() {
+        adapter.addAndNotify(0, ANY_OBJECT);
 
         verify(mockedCollection).add(0, ANY_OBJECT);
+        verify(adapter).notifyItemInserted(0);
     }
 
     @Test
-    public void shouldAddAllElementsToAdapteeCollection() {
-        adapter.addAll(ANY_OBJECT_COLLECTION);
+    public void shouldAddElementAtEndPositionToCollection() {
+        when(mockedCollection.size()).thenReturn(ANY_SIZE);
+        adapter.addAndNotify(-1, ANY_OBJECT);
+
+        verify(mockedCollection).add(ANY_OBJECT);
+        verify(adapter).notifyItemInserted(ANY_SIZE);
+    }
+
+    @Test
+    public void shouldAddAllElementsToCollection() {
+        when(mockedCollection.size()).thenReturn(ANY_SIZE);
+        adapter.addAllAndNotify(ANY_OBJECT_COLLECTION);
 
         verify(mockedCollection).addAll(ANY_OBJECT_COLLECTION);
+        verify(adapter).notifyItemRangeInserted(ANY_SIZE, ANY_OBJECT_COLLECTION.size());
     }
 
     @Test
-    public void shouldAddAllElementsAtPositionToAdapteeCollection() {
-        adapter.addAll(0, ANY_OBJECT_COLLECTION);
+    public void shouldAddAllElementsAtPositionToCollection() {
+        adapter.addAllAndNotify(0, ANY_OBJECT_COLLECTION);
 
         verify(mockedCollection).addAll(0, ANY_OBJECT_COLLECTION);
+        verify(adapter).notifyItemRangeInserted(0, ANY_OBJECT_COLLECTION.size());
     }
 
     @Test
-    public void shouldRemoveElementFromAdapteeCollection() {
+    public void shouldRemoveElementFromCollection() {
         adapter.remove(ANY_OBJECT);
-
         verify(mockedCollection).remove(ANY_OBJECT);
     }
 
     @Test
-    public void shouldUpdateElementAtPositionFromAdapteeCollection() {
-        adapter.update(0, ANY_OBJECT);
+    public void shouldRemoveElementFromCollection2() {
+        when(mockedCollection.indexOf(ANY_OBJECT)).thenReturn(ANY_SIZE);
+        adapter.removeAndNotify(ANY_OBJECT);
+
+        verify(mockedCollection).remove(ANY_SIZE);
+        verify(adapter).notifyItemRemoved(ANY_SIZE);
+    }
+
+    @Test
+    public void shouldUpdateElementAtPositionFromCollection() {
+        adapter.updateAndNotify(0, ANY_OBJECT);
 
         verify(mockedCollection).set(0, ANY_OBJECT);
+        verify(adapter).notifyItemChanged(0);
     }
 
     @Test
-    public void shouldRemoveAllElementsFromAdapteeCollection() {
-        adapter.removeAll(ANY_OBJECT_COLLECTION);
+    public void shouldRemoveAllElementsFromCollection() {
+        adapter.removeAllAndNotify(ANY_OBJECT_COLLECTION);
 
         verify(mockedCollection).removeAll(ANY_OBJECT_COLLECTION);
+        verify(adapter).notifyDataSetChanged();
     }
 
     @Test
-    public void shouldClearElementsFromAdapteeCollection() {
-        adapter.clear();
+    public void shouldClearElementsFromCollection() {
+        adapter.clearAndNotify();
 
         verify(mockedCollection).clear();
+        verify(adapter).notifyDataSetChanged();
+    }
+
+    @Test
+    public void shouldGetIndexFromCollection() {
+        adapter.indexOf(ANY_OBJECT);
+
+        verify(mockedCollection).indexOf(ANY_OBJECT);
+    }
+
+    @Test
+    public void shouldContainAllItemsInCollection() {
+        adapter.containsAll(ANY_OBJECT_COLLECTION);
+
+        verify(mockedCollection).containsAll(ANY_OBJECT_COLLECTION);
+    }
+
+    @Test
+    public void shouldContainItemInCollection() {
+        adapter.contains(ANY_OBJECT);
+
+        verify(mockedCollection).contains(ANY_OBJECT);
     }
 
     @Test
@@ -212,6 +258,11 @@ public class RendererAdapterTest {
         adapter.onBindViewHolder(mockedRendererViewHolder, ANY_POSITION);
 
         verify(mockedRenderer).render(Collections.emptyList());
+    }
+
+    @Test(expected = NullRendererBuiltException.class)
+    public void shouldThrowExceptionIfNullRenderer() {
+        adapter.onBindViewHolder(mockedRendererViewHolder, ANY_POSITION);
     }
 
     private void initializeMocks() {

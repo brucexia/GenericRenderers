@@ -16,6 +16,7 @@
 package com.pedrogomez.renderers;
 
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -126,83 +127,188 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
     }
 
     /**
-     * Add an element to the AdapteeCollection.
-     *
-     * @param element to add.
-     * @return if the element has been added.
+     * @see List#add(Object)
      */
     public boolean add(Object element) {
         return collection.add((T) element);
     }
 
     /**
-     * Add an element to the AdapteeCollection.
-     *
-     * @param index the index at which to add the object.
-     * @param element to add.
-     * @return if the element has been added.
+     * @see List#add(Object)
+     * @see RecyclerView.Adapter#notifyItemInserted(int)
      */
-    public void add(int index, Object element) {
-        collection.add(index, (T) element);
+    public boolean addAndNotify(Object element) {
+        boolean result = add(element);
+        notifyItemInserted(collection.size());
+        return result;
     }
 
     /**
-     * Updates an element to the AdapteeCollection.
+     * Convenient add method that also supports negative index to specify
+     * that the addition should be done at the end of the list.
      *
-     * @param index the index at which to update the object.
-     * @param element the updated object.
-     * @return the updated element.
+     * @see List#add(int, Object)
+     */
+    public void add(int index, Object element) {
+        if (index < 0) {
+            add(element);
+        } else {
+            collection.add(index, (T) element);
+        }
+    }
+
+    /**
+     * Convenient add method that also supports negative index to specify
+     * that the addition should be done at the end of the list.
+     *
+     * @see List#add(int, Object)
+     * @see RecyclerView.Adapter#notifyItemInserted(int)
+     */
+    public void addAndNotify(int index, Object element) {
+        add(index, element);
+        if (index < 0) {
+            index = collection.size();
+        }
+        notifyItemInserted(index);
+    }
+
+    /**
+     * @see List#set(int, Object)
      */
     public T update(int index, Object element) {
         return collection.set(index, (T) element);
     }
 
     /**
-     * Remove an element from the AdapteeCollection.
-     *
-     * @param element to remove.
-     * @return if the element has been removed.
+     * @see List#set(int, Object)
+     * @see RecyclerView.Adapter#notifyItemChanged(int)
+     */
+    public T updateAndNotify(int index, Object element) {
+        T set = update(index, (T) element);
+        notifyItemChanged(index);
+        return set;
+    }
+
+    /**
+     * @see List#remove(Object)
      */
     public boolean remove(Object element) {
         return collection.remove(element);
     }
 
     /**
-     * Add a Collection of elements to the AdapteeCollection.
-     *
-     * @param elements to add.
-     * @return if the elements have been added.
+     * @see List#remove(int)
+     * @see RecyclerView.Adapter#notifyItemRemoved(int)
+     */
+    public Object removeAndNotify(Object element) {
+        int indexOf = collection.indexOf(element);
+        return removeAtAndNotify(indexOf);
+    }
+
+    /**
+     * @see List#remove(int)
+     */
+    public T removeAt(int location) {
+        return collection.remove(location);
+    }
+
+    /**
+     * @see List#remove(int)
+     * @see RecyclerView.Adapter#notifyItemRemoved(int)
+     */
+    public Object removeAtAndNotify(int indexOf) {
+        Object remove = removeAt(indexOf);
+        notifyItemRemoved(indexOf);
+        return remove;
+    }
+
+    /**
+     * @see List#addAll(Collection)
      */
     public boolean addAll(Collection elements) {
         return collection.addAll(elements);
     }
 
     /**
-     * Add a Collection of elements to the AdapteeCollection.
-     *
-     * @param index the index at which to add the object.
-     * @param elements to add.
-     * @return if the elements have been added.
+     * @see List#addAll(int, Collection)
      */
     public boolean addAll(int index, Collection elements) {
         return collection.addAll(index, elements);
     }
 
     /**
-     * Remove a Collection of elements to the AdapteeCollection.
-     *
-     * @param elements to remove.
-     * @return if the elements have been removed.
+     * @see List#addAll(Collection)
+     * @see RecyclerView.Adapter#notifyItemRangeInserted(int, int)
+     */
+    public boolean addAllAndNotify(Collection elements) {
+        int size = collection.size();
+        boolean result = addAll(elements);
+        notifyItemRangeInserted(size, elements.size());
+        return result;
+    }
+
+    /**
+     * @see List#addAll(int, Collection)
+     * @see RecyclerView.Adapter#notifyItemRangeInserted(int, int)
+     */
+    public boolean addAllAndNotify(int index, Collection elements) {
+        boolean result = addAll(index, elements);
+        notifyItemRangeInserted(index, elements.size());
+        return result;
+    }
+
+    /**
+     * @see List#removeAll(Collection)
      */
     public boolean removeAll(Collection<?> elements) {
         return collection.removeAll(elements);
     }
 
     /**
-     * Remove all elements inside the AdapteeCollection.
+     * @see List#removeAll(Collection)
+     * @see Adapter#notifyDataSetChanged()
+     */
+    public boolean removeAllAndNotify(Collection<?> elements) {
+        boolean result = removeAll(elements);
+        notifyDataSetChanged();
+        return result;
+    }
+
+    /**
+     * @see List#clear()
      */
     public void clear() {
         collection.clear();
+    }
+
+    /**
+     * @see List#clear()
+     * @see Adapter#notifyDataSetChanged()
+     */
+    public void clearAndNotify() {
+        clear();
+        notifyDataSetChanged();
+    }
+
+    /**
+     * @see List#indexOf(Object)
+     */
+    public int indexOf(Object object) {
+        return collection.indexOf(object);
+    }
+
+    /**
+     * @see List#contains(Object)
+     */
+    public boolean contains(Object object) {
+        return collection.contains(object);
+    }
+
+    /**
+     * @see List#containsAll(Collection)
+     */
+    public boolean containsAll(Collection<Object> object) {
+        return collection.containsAll(object);
     }
 
     /**

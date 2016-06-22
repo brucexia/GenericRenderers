@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
-
 public class RendererTest {
 
     @Spy

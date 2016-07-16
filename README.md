@@ -163,7 +163,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.Shyish:GenericRenderers:1.0'
+        compile 'com.github.Shyish:GenericRenderers:xx'
 }
 ```
 
@@ -180,10 +180,7 @@ Or declare it into your pom.xml
 <dependency>
     <groupId>com.github.Shyish</groupId>
     <artifactId>GenericRenderers</artifactId>
-    <version>1.0</version>
+    <version>xx</version>
 </dependency>
 ```
 
-UPDATES
----
-* v1.0 Base version.

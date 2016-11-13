@@ -76,7 +76,7 @@ public class RendererBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotAcceptNullTypePototype() {
+    public void shouldNotAcceptNullTypePrototype() {
         RendererBuilder rendererBuilder = new RendererBuilder();
 
         rendererBuilder.bind(1, null);
@@ -179,17 +179,25 @@ public class RendererBuilderTest {
     }
 
     @Test
-    public void shouldAddPrototypeAndConfigureRendererBindingForTypeWithMultiplePrototypes() {
+    public void shouldReturnSamePrototypeInstance() {
         RendererBuilder rendererBuilder = new RendererBuilder();
 
-        rendererBuilder.bind(Object.class, new ObjectRenderer());
-        rendererBuilder.bind(String.class, new ObjectRenderer());
+        ObjectRenderer prototype1 = new ObjectRenderer();
+        ObjectRenderer prototype2 = new ObjectRenderer();
 
-        assertEquals(ObjectRenderer.class, rendererBuilder.getPrototypeClass(new Object()));
+        rendererBuilder.bind(Object.class, prototype1);
+        rendererBuilder.bind(String.class, prototype2);
+
+        int index = rendererBuilder.getItemViewType(new Object());
+
+        assertEquals(prototype1, rendererBuilder.getPrototypeByIndex(index));
+
+        index = rendererBuilder.getItemViewType("");
+        assertEquals(prototype2, rendererBuilder.getPrototypeByIndex(index));
     }
 
     @Test
-    public void shouldAddPrototyeAndConfigureBindingOnConstruction() {
+    public void shouldAddPrototypeAndConfigureBindingOnConstruction() {
         ObjectRenderer renderer = new ObjectRenderer();
         RendererBuilder rendererBuilder = new RendererBuilder(renderer);
 

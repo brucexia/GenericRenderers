@@ -15,6 +15,8 @@
  */
 package com.pedrogomez.renderers;
 
+import android.support.v4.util.ArrayMap;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -26,7 +28,6 @@ import com.pedrogomez.renderers.exception.NullPrototypeClassException;
 import com.pedrogomez.renderers.exception.PrototypeNotFoundException;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +48,13 @@ import java.util.Map;
 @SuppressWarnings({"DuplicateStringLiteralInspection", "unchecked", "SuspiciousMethodCalls"})
 public class RendererBuilder<T> {
 
-    protected List<Renderer> prototypes;
-
     private ViewGroup parent;
     private LayoutInflater layoutInflater;
     private Integer viewType;
+
+    protected List<Renderer> prototypes;
     protected final Map<Class<T>, Class<? extends Renderer>> binding;
-    protected final HashMap<Integer, Class<? extends Renderer>> typeBindings = new HashMap<>(0);
+    protected final SparseArray<Class<? extends Renderer>> typeBindings = new SparseArray<>(0);
 
     /**
      * Initializes a RendererBuilder with an empty prototypes collection. Using this constructor some
@@ -77,7 +78,7 @@ public class RendererBuilder<T> {
      */
     public RendererBuilder(List<Renderer> prototypes) {
         setPrototypes(prototypes);
-        binding = new HashMap<>(1);
+        binding = new ArrayMap<>(1);
     }
 
     /**
@@ -97,7 +98,7 @@ public class RendererBuilder<T> {
     public final void setPrototypes(List<Renderer> prototypes) {
         if (prototypes == null) {
             throw new NeedsPrototypesException("RendererBuilder has to be created with a non null collection of"
-                    + "Collection<Renderer to provide new or recycled Renderer instances");
+                  + "List<Renderer> to provide new or recycled Renderer instances");
         }
         this.prototypes = prototypes;
     }
@@ -111,7 +112,7 @@ public class RendererBuilder<T> {
     public RendererBuilder<T> withPrototypes(List<Renderer> prototypes) {
         if (prototypes == null) {
             throw new NeedsPrototypesException("RendererBuilder has to be created with a non null collection of"
-                    + "Collection<Renderer to provide new or recycled Renderer instances");
+                  + "List<Renderer> to provide new or recycled Renderer instances");
         }
         this.prototypes.addAll(prototypes);
         return this;
@@ -190,7 +191,7 @@ public class RendererBuilder<T> {
      * @param prototypeIndex used to search.
      * @return prototype renderer.
      */
-    private Renderer getPrototypeByIndex(int prototypeIndex) {
+    protected Renderer getPrototypeByIndex(int prototypeIndex) {
         return prototypes.get(prototypeIndex);
     }
 
@@ -229,7 +230,7 @@ public class RendererBuilder<T> {
         }
         if (itemViewType == -1) {
             throw new PrototypeNotFoundException("Review your RendererBuilder implementation, you are returning one"
-                    + " prototype class not found in prototypes collection");
+                  + " prototype class not found in prototypes collection");
         }
         return itemViewType;
     }
@@ -257,7 +258,7 @@ public class RendererBuilder<T> {
      * @return the class associated to the renderer.
      */
     protected Class getPrototypeClass(T content) {
-        if (!typeBindings.isEmpty() && content instanceof RendererContent) {
+        if (typeBindings.size() != 0 && content instanceof RendererContent) {
             RendererContent rendererContent = (RendererContent) content;
             Class<? extends Renderer> renderer = typeBindings.get(rendererContent.getType());
             if (renderer != null) {

@@ -49,6 +49,7 @@ public class RendererAdapterTest {
     private static final int ANY_SIZE = 11;
     private static final int ANY_POSITION = 2;
     private static final Object ANY_OBJECT = new Object();
+    private static final Object ANY_OTHER_OBJECT = new Object();
     private static final Collection<Object> ANY_OBJECT_COLLECTION = new LinkedList<>();
     private static final int ANY_ITEM_VIEW_TYPE = 3;
 
@@ -196,7 +197,15 @@ public class RendererAdapterTest {
         adapter.updateAndNotify(0, ANY_OBJECT);
 
         verify(mockedCollection).set(0, ANY_OBJECT);
-        verify(adapter).notifyItemChanged(0);
+        verify(adapter).notifyItemChanged(0, null);
+    }
+
+    @Test
+    public void shouldUpdateElementAtPositionFromCollectionAndPassPayload() {
+        adapter.updateAndNotify(0, ANY_OBJECT, ANY_OTHER_OBJECT);
+
+        verify(mockedCollection).set(0, ANY_OBJECT);
+        verify(adapter).notifyItemChanged(0, ANY_OTHER_OBJECT);
     }
 
     @Test

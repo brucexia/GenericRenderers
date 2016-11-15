@@ -15,6 +15,7 @@
  */
 package com.pedrogomez.renderers;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
@@ -184,8 +185,16 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
      * @see RecyclerView.Adapter#notifyItemChanged(int)
      */
     public T updateAndNotify(int index, Object element) {
+        return updateAndNotify(index, element, null);
+    }
+
+    /**
+     * @see List#set(int, Object)
+     * @see RecyclerView.Adapter#notifyItemChanged(int, Object)
+     */
+    public T updateAndNotify(int index, Object element, @Nullable Object payload) {
         T set = update(index, element);
-        notifyItemChanged(index);
+        notifyItemChanged(index, payload);
         return set;
     }
 

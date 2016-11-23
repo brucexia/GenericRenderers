@@ -176,7 +176,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.Shyish:GenericRenderers:2.1.0'
+        compile 'com.github.Shyish:GenericRenderers:2.1.1'
 }
 ```
 

@@ -1,4 +1,4 @@
-GenericRenderers [![Build Status](https://travis-ci.org/aballano/GenericRenderers.svg?branch=master)](https://travis-ci.org/aballano/GenericRenderers) [![](https://jitpack.io/v/aballano/GenericRenderers.svg)](https://jitpack.io/#aballano/GenericRenderers) [![codecov](https://codecov.io/gh/aballano/GenericRenderers/branch/master/graph/badge.svg)](https://codecov.io/gh/aballano/GenericRenderers) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GenericRenderers-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3364) <a href="http://www.methodscount.com/?lib=com.github.Shyish%3AGenericRenderers%3A2.1.1"><img src="https://img.shields.io/badge/Methods and size-core: 139 | deps: 11465 | 17 KB-e91e63.svg"/></a>
+GenericRenderers [![Build Status](https://travis-ci.org/aballano/GenericRenderers.svg?branch=master)](https://travis-ci.org/aballano/GenericRenderers) [![](https://jitpack.io/v/aballano/GenericRenderers.svg)](https://jitpack.io/#aballano/GenericRenderers) [![codecov](https://codecov.io/gh/aballano/GenericRenderers/branch/master/graph/badge.svg)](https://codecov.io/gh/aballano/GenericRenderers) [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-GenericRenderers-brightgreen.svg?style=flat)](http://android-arsenal.com/details/1/3364) <a href="http://www.methodscount.com/?lib=com.github.aballano%3AGenericRenderers%3A2.1.1"><img src="https://img.shields.io/badge/Methods and size-core: 139 | deps: 11465 | 17 KB-e91e63.svg"/></a>
 ===
 
 Based on [Renderers lib](https://github.com/pedrovgs/Renderers) made by [pedrovgs](https://github.com/pedrovgs)
@@ -176,7 +176,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.Shyish:GenericRenderers:2.1.1'
+        compile 'com.github.aballano:GenericRenderers:2.1.1'
 }
 ```
 
@@ -191,7 +191,7 @@ Or declare it into your pom.xml
 </repositories>
 
 <dependency>
-    <groupId>com.github.Shyish</groupId>
+    <groupId>com.github.aballano</groupId>
     <artifactId>GenericRenderers</artifactId>
     <version>xx</version>
 </dependency>

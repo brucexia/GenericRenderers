@@ -176,7 +176,7 @@ allprojects {
 }
 
 dependencies {
-        compile 'com.github.aballano:GenericRenderers:2.1.1'
+        compile 'com.github.aballano:GenericRenderers:x.x.x'
 }
 ```
 
@@ -193,7 +193,7 @@ Or declare it into your pom.xml
 <dependency>
     <groupId>com.github.aballano</groupId>
     <artifactId>GenericRenderers</artifactId>
-    <version>xx</version>
+    <version>x.x.x</version>
 </dependency>
 ```
 

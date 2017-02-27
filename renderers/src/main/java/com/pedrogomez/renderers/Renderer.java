@@ -134,10 +134,21 @@ public abstract class Renderer<T> implements Cloneable {
      *
      * @param rootView inflated using previously.
      */
-    protected  void hookListeners(View rootView) { }
+    protected void hookListeners(View rootView) { }
+
+    /**
+     * @see RendererAdapter#onViewAttachedToWindow(RendererViewHolder)
+     */
+    public void onAttached() { }
+
+    /**
+     * @see RendererAdapter#onViewDetachedFromWindow(RendererViewHolder)
+     */
+    public void onDetached() { }
 
     /**
      * Method where the presentation logic algorithm have to be declared or implemented.
+     *
      * @param payloads Extra payloads for fine-grain rendering.
      */
     public abstract void render(List<Object> payloads);

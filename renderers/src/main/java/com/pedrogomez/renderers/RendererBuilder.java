@@ -27,6 +27,7 @@ import com.pedrogomez.renderers.exception.NullParentException;
 import com.pedrogomez.renderers.exception.NullPrototypeClassException;
 import com.pedrogomez.renderers.exception.PrototypeNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +46,7 @@ import java.util.Map;
  *
  * @author Pedro Vicente Gómez Sánchez
  */
-@SuppressWarnings({"DuplicateStringLiteralInspection", "unchecked", "SuspiciousMethodCalls"})
+@SuppressWarnings({"deprecation", "unused"})
 public class RendererBuilder<T> {
 
     private ViewGroup parent;
@@ -59,7 +60,10 @@ public class RendererBuilder<T> {
     /**
      * Initializes a RendererBuilder with an empty prototypes collection. Using this constructor some
      * binding configuration is needed.
+     *
+     * @deprecated Use {@link #create()} or {@link #create(Renderer)} for builder-like creation
      */
+    @Deprecated
     public RendererBuilder() {
         this(new LinkedList<Renderer>());
     }
@@ -67,7 +71,10 @@ public class RendererBuilder<T> {
     /**
      * Initializes a RendererBuilder with just one prototype. Using this constructor the prototype
      * used will be always the same and the additional binding configuration wont be needed.
+     *
+     * @deprecated Use {@link #create()} or {@link #create(Renderer)} for builder-like creation
      */
+    @Deprecated
     public RendererBuilder(Renderer renderer) {
         this(Collections.singletonList(renderer));
     }
@@ -75,10 +82,33 @@ public class RendererBuilder<T> {
     /**
      * Initializes a RendererBuilder with a list of prototypes. Using this constructor some
      * binding configuration is needed.
+     *
+     * @deprecated Use {@link #create()} or {@link #create(Renderer)} for builder-like creation
      */
+    @Deprecated
     public RendererBuilder(List<Renderer> prototypes) {
-        setPrototypes(prototypes);
+        if (prototypes == null) {
+            throw new NeedsPrototypesException("RendererBuilder has to be created with a non null collection of"
+                  + "Collection<Renderer to provide new or recycled Renderer instances");
+        }
+        this.prototypes = prototypes;
         binding = new ArrayMap<>(1);
+    }
+
+    /**
+     * Initializes a RendererBuilder without Renderers. Using this constructor some
+     * binding configuration is needed.
+     */
+    public static <T> ExtendedRendererBuilder<T> create() {
+        return new Builder<>(new RendererBuilder<T>());
+    }
+
+    /**
+     * Initializes a RendererBuilder with just one prototype. Using this constructor the prototype
+     * used will be always the same for any type added.
+     */
+    public static SimpleRendererBuilder create(Renderer renderer) {
+        return new Builder<>(new RendererBuilder<>(renderer));
     }
 
     /**
@@ -88,19 +118,6 @@ public class RendererBuilder<T> {
      */
     public final List<Renderer> getPrototypes() {
         return prototypes;
-    }
-
-    /**
-     * Configure prototypes used as Renderer instances.
-     *
-     * @param prototypes to use by the builder in order to create Renderer instances.
-     */
-    public final void setPrototypes(List<Renderer> prototypes) {
-        if (prototypes == null) {
-            throw new NeedsPrototypesException("RendererBuilder has to be created with a non null collection of"
-                  + "List<Renderer> to provide new or recycled Renderer instances");
-        }
-        this.prototypes = prototypes;
     }
 
     /**
@@ -118,36 +135,6 @@ public class RendererBuilder<T> {
         return this;
     }
 
-    /**
-     * Given a class configures the binding between a class and a Renderer class.
-     *
-     * @param clx       to bind.
-     * @param prototype used as Renderer.
-     * @return the current RendererBuilder instance.
-     */
-    public RendererBuilder<T> bind(Class clx, Renderer prototype) {
-        if (clx == null || prototype == null) {
-            throw new IllegalArgumentException("The binding RecyclerView binding can't be configured using null instances");
-        }
-        prototypes.add(prototype);
-        binding.put(clx, prototype.getClass());
-        return this;
-    }
-
-    /**
-     * Binds a custom type to a given {@link Renderer}.
-     *
-     * @param type      Integer type.
-     * @param prototype used as Renderer.
-     */
-    public RendererBuilder<T> bind(int type, Renderer prototype) {
-        if (prototype == null) {
-            throw new IllegalArgumentException("The binding RecyclerView binding can't be configured using null instances");
-        }
-        typeBindings.put(type, prototype.getClass());
-        prototypes.add(prototype);
-        return this;
-    }
 
     RendererBuilder withParent(ViewGroup parent) {
         this.parent = parent;
@@ -271,10 +258,100 @@ public class RendererBuilder<T> {
         }
 
         Class<?> aClass = content.getClass();
-        if (binding.containsKey(aClass)) {
-            return binding.get(aClass);
+        //noinspection SSBasedInspection
+        for (Map.Entry<Class<T>, Class<? extends Renderer>> entry : binding.entrySet()) {
+            if (entry.getKey().isAssignableFrom(aClass)) {
+                return entry.getValue();
+            }
         }
 
         throw new PrototypeNotFoundException("No prototype was found for the class " + aClass.getSimpleName());
+    }
+
+    /*******************************************************************
+     * Step builder pattern http://www.svlada.com/step-builder-pattern *
+     *******************************************************************/
+
+    public interface BaseRendererBuilder<T> {
+        RendererBuilder<T> getRendererBuilder();
+    }
+
+    public interface SimpleRendererBuilder<T> extends BaseRendererBuilder<T> {
+        RendererAdapter<T> build();
+
+        RendererAdapter<T> buildWith(List collection);
+    }
+
+    public interface BindedExtendedRendererBuilder<T> extends ExtendedRendererBuilder<T> {
+        RendererAdapter<T> build();
+
+        RendererAdapter<T> buildWith(List collection);
+    }
+
+    public interface ExtendedRendererBuilder<T> extends BaseRendererBuilder<T> {
+        <Type> BindedExtendedRendererBuilder<T> bind(Class<? extends Type> clx, Renderer<Type> prototype);
+
+        <Type> BindedExtendedRendererBuilder<T> bind(int type, Renderer<RendererContent<Type>> prototype);
+    }
+
+    public static class Builder<T> implements SimpleRendererBuilder<T>, BindedExtendedRendererBuilder<T> {
+
+        protected final RendererBuilder<T> rendererBuilder;
+
+        public Builder(RendererBuilder<T> rendererBuilder) {
+            this.rendererBuilder = rendererBuilder;
+        }
+
+        @Override public RendererAdapter<T> build() {
+            return buildWith(new ArrayList(10));
+        }
+
+        @Override public RendererAdapter<T> buildWith(List collection) {
+            return new RendererAdapter<>(rendererBuilder, collection);
+        }
+
+        @Override public RendererBuilder<T> getRendererBuilder() {
+            return rendererBuilder;
+        }
+
+        /**
+         * Given a class configures the binding between a class and a Renderer class.
+         *
+         * @param clx       to bind.
+         * @param prototype used as Renderer.
+         * @return the current RendererBuilder instance.
+         */
+        @Override public BindedExtendedRendererBuilder<T> bind(Class clx, Renderer prototype) {
+            if (clx == null || prototype == null) {
+                throw new IllegalArgumentException("The binding RecyclerView binding can't be configured using null "
+                      + "instances");
+            }
+            if (clx.equals(Object.class)) {
+                throw new IllegalArgumentException("Making a bind to the Object class means that every item will be mapped "
+                      + "to the specified Renderer and thus all other bindings are invalidated. Please use the standard "
+                      + "constructor for that");
+            }
+            rendererBuilder.prototypes.add(prototype);
+            rendererBuilder.binding.put(clx, prototype.getClass());
+
+            return this;
+        }
+
+        /**
+         * Binds a custom type to a given {@link Renderer}.
+         *
+         * @param type      Integer type.
+         * @param prototype used as Renderer.
+         */
+        @Override public BindedExtendedRendererBuilder<T> bind(int type, Renderer prototype) {
+            if (prototype == null) {
+                throw new IllegalArgumentException("The binding RecyclerView binding can't be configured using null "
+                      + "instances");
+            }
+            rendererBuilder.typeBindings.put(type, prototype.getClass());
+            rendererBuilder.prototypes.add(prototype);
+
+            return this;
+        }
     }
 }

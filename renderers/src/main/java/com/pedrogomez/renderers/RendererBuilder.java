@@ -165,7 +165,7 @@ public class RendererBuilder<T> {
     protected RendererViewHolder buildRendererViewHolder() {
         validateAttributesToCreateANewRendererViewHolder();
 
-        Renderer renderer = getPrototypeByIndex(viewType).copy();
+        Renderer<?> renderer = getPrototypeByIndex(viewType);
         renderer.onCreate(null, layoutInflater, parent);
         return new RendererViewHolder(renderer);
     }

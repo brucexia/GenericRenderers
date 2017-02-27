@@ -152,20 +152,4 @@ public abstract class Renderer<T> implements Cloneable {
      * @param payloads Extra payloads for fine-grain rendering.
      */
     public abstract void render(List<Object> payloads);
-
-    /**
-     * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
-     * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
-     * method in Renderer subtypes.
-     *
-     * @return a copy of the current renderer.
-     */
-    Renderer<T> copy() {
-        try {
-            //noinspection unchecked
-            return (Renderer<T>) clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("All your renderers should be cloneable.");
-        }
-    }
 }

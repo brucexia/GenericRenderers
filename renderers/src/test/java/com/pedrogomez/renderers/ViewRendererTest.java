@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 @Config(sdk = 19, constants = BuildConfig.class)
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class ViewRendererTest {
 
     @Mock private ViewGroup mockedParent;

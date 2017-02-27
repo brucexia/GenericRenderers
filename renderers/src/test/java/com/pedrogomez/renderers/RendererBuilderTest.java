@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.Arrays;
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored", "ConstantConditions"})
 @Config(sdk = 19, constants = BuildConfig.class)
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class RendererBuilderTest {
 
     @Mock private View mockedConvertView;
@@ -184,20 +184,20 @@ public class RendererBuilderTest {
 
     @Test
     public void shouldReturnSamePrototypeInstance() {
-        ObjectRenderer prototype1 = new ObjectRenderer();
-        ObjectRenderer prototype2 = new ObjectRenderer();
+        ObjectRenderer integerPrototype = new ObjectRenderer();
+        ObjectRenderer stringPrototype = new ObjectRenderer();
 
         RendererBuilder rendererBuilder = RendererBuilder.create()
-              .bind(Integer.class, new ObjectRenderer())
-              .bind(String.class, new ObjectRenderer())
+              .bind(Integer.class, integerPrototype)
+              .bind(String.class, stringPrototype)
               .getRendererBuilder();
 
         int index = rendererBuilder.getItemViewType(1);
 
-        assertEquals(prototype1, rendererBuilder.getPrototypeByIndex(index));
+        assertEquals(integerPrototype, rendererBuilder.getPrototypeByIndex(index));
 
         index = rendererBuilder.getItemViewType("");
-        assertEquals(prototype2, rendererBuilder.getPrototypeByIndex(index));
+        assertEquals(stringPrototype, rendererBuilder.getPrototypeByIndex(index));
     }
 
     @Test

@@ -35,6 +35,8 @@ public class RendererTest {
     @Mock
     private View mockedView;
 
+    private int testPosition = 1;
+
     @Before
     public void setUp() {
         initializeRenderer();
@@ -48,6 +50,15 @@ public class RendererTest {
         onCreateRenderer();
 
         assertEquals(mockedContent, renderer.getContent());
+    }
+
+    @Test
+    public void shouldReturnCorrectItemPosition() {
+        givenARendererInflatingView(mockedView);
+
+        onCreateRenderer();
+
+        assertEquals(renderer.getPosition(), testPosition);
     }
 
     @Test
@@ -114,6 +125,7 @@ public class RendererTest {
 
     private void onCreateRenderer() {
         renderer.onCreate(mockedContent, mockedLayoutInflater, mockedParent);
+        renderer.setPosition(testPosition);
     }
 
     private void onRecycleRenderer() {

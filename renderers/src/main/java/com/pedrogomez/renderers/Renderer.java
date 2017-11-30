@@ -17,6 +17,7 @@ package com.pedrogomez.renderers;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,13 +40,10 @@ import java.util.List;
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
-@SuppressWarnings("UnusedParameters")
 public abstract class Renderer<T> implements Cloneable {
 
     private View rootView;
     private T content;
-    private Context context;
-    private int position;
 
     /**
      * Method called when the renderer is going to be created. This method has the responsibility of
@@ -59,10 +57,10 @@ public abstract class Renderer<T> implements Cloneable {
      */
     public void onCreate(@Nullable T content, LayoutInflater layoutInflater, ViewGroup parent) {
         this.content = content;
-        context = parent.getContext();
         rootView = inflate(layoutInflater, parent);
         if (rootView == null) {
-            throw new NotInflateViewException("Renderer instances have to return a not null view in inflateView method");
+            throw new NotInflateViewException(
+                  "Renderer instances have to return a not null view in inflateView method");
         }
         setUpView(rootView);
         hookListeners(rootView);
@@ -90,10 +88,12 @@ public abstract class Renderer<T> implements Cloneable {
     /**
      * Method to access to the current Renderer Context.
      *
-     * @return the context associated to the root view.
+     * @return the context associated to the root view or null if the root view has not been
+     * initialized.
      */
+    @Nullable
     protected Context getContext() {
-        return context;
+        return rootView != null ? rootView.getContext() : null;
     }
 
     /**
@@ -113,24 +113,10 @@ public abstract class Renderer<T> implements Cloneable {
     }
 
     /**
-     * Stores the position of the item in the Adapter.
-     *
-     * @param position
-     */
-    public void setPosition(int position) {
-        this.position = position;
-    }
-    /**
-     * @returns the position of the item
-     */
-    protected final int getPosition() {
-        return this.position;
-    }
-
-    /**
      * Inflate renderer layout. The view inflated can't be null. If this method returns a null view a
      * NotInflateViewException will be thrown.
      * <p />
+     * <b>Please note that {@link #getContext()} will return null at this point.</b>
      *
      * @param inflater LayoutInflater service to inflate.
      * @param parent view group associated to the current Renderer instance.
@@ -150,43 +136,30 @@ public abstract class Renderer<T> implements Cloneable {
      *
      * @param rootView inflated using previously.
      */
-    protected void hookListeners(View rootView) { }
-
-    /**
-     * @see RendererAdapter#onViewAttachedToWindow(RendererViewHolder)
-     */
-    public void onAttached() { }
-
-    /**
-     * @see RendererAdapter#onViewDetachedFromWindow(RendererViewHolder)
-     */
-    public void onDetached() { }
-
-    /**
-     * @see RendererAdapter#onViewRecycled(RendererViewHolder)
-     */
-    public void onRecycled() { }
+    protected  void hookListeners(View rootView) { }
 
     /**
      * Method where the presentation logic algorithm have to be declared or implemented.
-     *
      * @param payloads Extra payloads for fine-grain rendering.
      */
     public abstract void render(List<Object> payloads);
+    public void render(List<Object> payloads, int position, RecyclerView.ViewHolder holder) {
+        render(payloads);
+    }
 
-    /**
-     * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
-     * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
-     * method in Renderer subtypes.
-     *
-     * @return a copy of the current renderer.
-     */
+        /**
+         * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
+         * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
+         * method in Renderer subtypes.
+         *
+         * @return a copy of the current renderer.
+         */
     Renderer<T> copy() {
         try {
             //noinspection unchecked
             return (Renderer<T>) clone();
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("All your renderers should be cloneable.");
+            throw new RuntimeException("All your renderers should be clonables.");
         }
     }
 }

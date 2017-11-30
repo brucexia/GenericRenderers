@@ -15,9 +15,7 @@
  */
 package com.pedrogomez.renderers;
 
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -31,33 +29,29 @@ import java.util.List;
 /**
  * RecyclerView.Adapter extension created to work RendererBuilders and Renderer instances. Other
  * adapters have to use this one to show information into RecyclerView widgets.
- *
+ * <p>
  * This class is the heart of this library. It's used to avoid the library users declare a new
  * renderer each time they have to show information into a RecyclerView.
- *
+ * <p>
  * RendererAdapter has to be constructed with a LayoutInflater to inflate views, one
- * RendererBuilder to provide Renderer to RendererAdapter and one Collection to
+ * RendererBuilder to provide Renderer to RendererAdapter and one AdapteeCollection to
  * provide the elements to render.
  *
  * @author Pedro Vicente Gómez Sánchez.
  */
+@SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
 public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder> {
 
     private final RendererBuilder<T> rendererBuilder;
     private final List<T> collection;
 
     public RendererAdapter(RendererBuilder rendererBuilder) {
-        this(rendererBuilder, new ArrayList(10));
+        this(rendererBuilder, new ArrayList());
     }
 
     public RendererAdapter(RendererBuilder rendererBuilder, List collection) {
         this.rendererBuilder = rendererBuilder;
         this.collection = collection;
-    }
-
-    public RendererAdapter<T> into(RecyclerView recyclerView) {
-        recyclerView.setAdapter(this);
-        return this;
     }
 
     @Override
@@ -92,7 +86,7 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
      * information given as parameter.
      *
      * @param viewGroup used to create the ViewHolder.
-     * @param viewType associated to the renderer.
+     * @param viewType  associated to the renderer.
      * @return ViewHolder extension with the Renderer it has to use inside.
      */
     @Override
@@ -112,11 +106,11 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
      * Renderer previously stored into the RendererViewHolder.
      *
      * @param viewHolder with a Renderer class inside.
-     * @param position to render.
+     * @param position   to render.
      */
     @Override
     public void onBindViewHolder(RendererViewHolder viewHolder, int position) {
-        onBindViewHolder(viewHolder, position, Collections.emptyList());
+        onBindViewHolder(viewHolder, position, Collections.EMPTY_LIST);
     }
 
     @Override
@@ -127,244 +121,61 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
             throw new NullRendererBuiltException("RendererBuilder have to return a not null renderer");
         }
         renderer.setContent(content);
-        renderer.setPosition(position);
         updateRendererExtraValues(content, renderer, position);
-        renderer.render(payloads);
-    }
-
-    @Override public void onViewAttachedToWindow(RendererViewHolder viewHolder) {
-        super.onViewAttachedToWindow(viewHolder);
-        Renderer renderer = viewHolder.getRenderer();
-        renderer.onAttached();
-    }
-
-    @Override public void onViewDetachedFromWindow(RendererViewHolder viewHolder) {
-        Renderer renderer = viewHolder.getRenderer();
-        renderer.onDetached();
-        super.onViewDetachedFromWindow(viewHolder);
-    }
-
-    @Override public void onViewRecycled(RendererViewHolder viewHolder) {
-        Renderer renderer = viewHolder.getRenderer();
-        renderer.onRecycled();
-        super.onViewRecycled(viewHolder);
+        renderer.render(payloads, position, viewHolder);
     }
 
     /**
-     * @see List#add(Object)
+     * Add an element to the AdapteeCollection.
+     *
+     * @param element to add.
+     * @return if the element has been added.
      */
     public boolean add(Object element) {
         return collection.add((T) element);
     }
 
     /**
-     * @see List#add(Object)
-     * @see RecyclerView.Adapter#notifyItemInserted(int)
-     */
-    public boolean addAndNotify(Object element) {
-        boolean result = add(element);
-        notifyItemInserted(collection.size());
-        return result;
-    }
-
-    /**
-     * Convenient add method that also supports negative index to specify
-     * that the addition should be done at the end of the list.
+     * Remove an element from the AdapteeCollection.
      *
-     * @see List#add(int, Object)
-     */
-    public void add(int index, Object element) {
-        if (index < 0) {
-            add(element);
-        } else {
-            collection.add(index, (T) element);
-        }
-    }
-
-    /**
-     * Convenient add method that also supports negative index to specify
-     * that the addition should be done at the end of the list.
-     *
-     * @see List#add(int, Object)
-     * @see RecyclerView.Adapter#notifyItemInserted(int)
-     */
-    public void addAndNotify(int index, Object element) {
-        add(index, element);
-        if (index < 0) {
-            index = collection.size();
-        }
-        notifyItemInserted(index);
-    }
-
-    /**
-     * @see List#set(int, Object)
-     */
-    public T update(int index, Object element) {
-        return collection.set(index, (T) element);
-    }
-
-    /**
-     * @see List#set(int, Object)
-     * @see RecyclerView.Adapter#notifyItemChanged(int)
-     */
-    public T updateAndNotify(int index, Object element) {
-        return updateAndNotify(index, element, null);
-    }
-
-    /**
-     * @see List#set(int, Object)
-     * @see RecyclerView.Adapter#notifyItemChanged(int, Object)
-     */
-    public T updateAndNotify(int index, Object element, @Nullable Object payload) {
-        T set = update(index, element);
-        notifyItemChanged(index, payload);
-        return set;
-    }
-
-    /**
-     * @see RendererAdapter#removeAt(int)
-     * @see RendererAdapter#add(int, Object)
-     */
-    public void move(int currentPosition, int newPosition, Object element) {
-        removeAt(currentPosition);
-        add(newPosition, element);
-    }
-
-    /**
-     * @see RendererAdapter#move(int, int, Object)
-     * @see RecyclerView.Adapter#notifyItemMoved(int, int)
-     */
-    public void moveAndNotify(int currentPosition, int newPosition, Object element) {
-        move(currentPosition, newPosition, element);
-        notifyItemMoved(currentPosition, newPosition);
-    }
-
-    /**
-     * @see List#remove(Object)
+     * @param element to remove.
+     * @return if the element has been removed.
      */
     public boolean remove(Object element) {
         return collection.remove(element);
     }
 
     /**
-     * @see List#remove(int)
-     * @see RecyclerView.Adapter#notifyItemRemoved(int)
-     */
-    public Object removeAndNotify(Object element) {
-        int indexOf = collection.indexOf(element);
-        return removeAtAndNotify(indexOf);
-    }
-
-    /**
-     * @see List#remove(int)
-     */
-    public T removeAt(int location) {
-        return collection.remove(location);
-    }
-
-    /**
-     * @see List#remove(int)
-     * @see RecyclerView.Adapter#notifyItemRemoved(int)
-     */
-    public Object removeAtAndNotify(int indexOf) {
-        Object remove = removeAt(indexOf);
-        notifyItemRemoved(indexOf);
-        return remove;
-    }
-
-    /**
-     * @see List#addAll(Collection)
+     * Add a Collection of elements to the AdapteeCollection.
+     *
+     * @param elements to add.
+     * @return if the elements have been added.
      */
     public boolean addAll(Collection elements) {
         return collection.addAll(elements);
     }
 
     /**
-     * @see List#addAll(int, Collection)
-     */
-    public boolean addAll(int index, Collection elements) {
-        return collection.addAll(index, elements);
-    }
-
-    /**
-     * @see List#addAll(Collection)
-     * @see RecyclerView.Adapter#notifyItemRangeInserted(int, int)
-     */
-    public boolean addAllAndNotify(Collection elements) {
-        int size = collection.size();
-        boolean result = addAll(elements);
-        notifyItemRangeInserted(size, elements.size());
-        return result;
-    }
-
-    /**
-     * @see List#addAll(int, Collection)
-     * @see RecyclerView.Adapter#notifyItemRangeInserted(int, int)
-     */
-    public boolean addAllAndNotify(int index, Collection elements) {
-        boolean result = addAll(index, elements);
-        notifyItemRangeInserted(index, elements.size());
-        return result;
-    }
-
-    /**
-     * @see List#removeAll(Collection)
+     * Remove a Collection of elements to the AdapteeCollection.
+     *
+     * @param elements to remove.
+     * @return if the elements have been removed.
      */
     public boolean removeAll(Collection<?> elements) {
         return collection.removeAll(elements);
     }
 
     /**
-     * @see List#removeAll(Collection)
-     * @see Adapter#notifyDataSetChanged()
-     */
-    public boolean removeAllAndNotify(Collection<?> elements) {
-        boolean result = removeAll(elements);
-        notifyDataSetChanged();
-        return result;
-    }
-
-    /**
-     * @see List#clear()
+     * Remove all elements inside the AdapteeCollection.
      */
     public void clear() {
         collection.clear();
     }
 
     /**
-     * @see List#clear()
-     * @see Adapter#notifyDataSetChanged()
-     */
-    public void clearAndNotify() {
-        clear();
-        notifyDataSetChanged();
-    }
-
-    /**
-     * @see List#indexOf(Object)
-     */
-    public int indexOf(Object object) {
-        return collection.indexOf(object);
-    }
-
-    /**
-     * @see List#contains(Object)
-     */
-    public boolean contains(Object object) {
-        return collection.contains(object);
-    }
-
-    /**
-     * @see List#containsAll(Collection)
-     */
-    public boolean containsAll(Collection<Object> object) {
-        return collection.containsAll(object);
-    }
-
-    /**
-     * Allows the client code to access the List from subtypes of RendererAdapter.
+     * Allows the client code to access the AdapteeCollection from subtypes of RendererAdapter.
      *
-     * @return list used in the adapter.
+     * @return collection used in the adapter as the adaptee class.
      */
     public List<T> getCollection() {
         return collection;
@@ -373,14 +184,15 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
     /**
      * Empty implementation created to allow the client code to extend this class without override
      * getView method.
-     *
+     * <p>
      * This method is called before render the Renderer and can be used in RendererAdapter extension
      * to add extra info to the renderer created like the position in the ListView/RecyclerView.
      *
-     * @param content to be rendered.
+     * @param content  to be rendered.
      * @param renderer to be used to paint the content.
      * @param position of the content.
      */
     @SuppressWarnings("UnusedParameters")
-    protected void updateRendererExtraValues(T content, Renderer renderer, int position) { }
+    protected void updateRendererExtraValues(T content, Renderer renderer, int position) {
+    }
 }

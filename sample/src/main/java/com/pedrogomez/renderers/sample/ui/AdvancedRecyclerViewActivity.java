@@ -54,11 +54,10 @@ public class AdvancedRecyclerViewActivity extends Activity {
 
         List<Video> videoCollection = RandomVideoCollectionGenerator.generateList(VIDEO_COUNT);
 
-        RendererAdapter adapter = RendererBuilder.create()
+        RendererBuilder rendererBuilder = new RendererBuilder()
               .bind(Video.class, new VideoRenderer())
-              .bind(String.class, new SectionRenderer())
-              .build()
-              .into(recyclerView);
+              .bind(String.class, new SectionRenderer());
+        RendererAdapter adapter = new RendererAdapter(rendererBuilder);
         recyclerView.setAdapter(adapter);
 
         for (int i = 0, videoCollectionSize = videoCollection.size(); i < videoCollectionSize; i++) {

@@ -1,7 +1,5 @@
 package com.pedrogomez.renderers;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +13,14 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+/**
+ * Test created to check the correctness of Renderer<T>
+ *
+ * @author Pedro Vicente Gómez Sánchez.
+ */
 
 public class RendererTest {
 
@@ -34,8 +35,6 @@ public class RendererTest {
     private ViewGroup mockedParent;
     @Mock
     private View mockedView;
-
-    private int testPosition = 1;
 
     @Before
     public void setUp() {
@@ -53,15 +52,6 @@ public class RendererTest {
     }
 
     @Test
-    public void shouldReturnCorrectItemPosition() {
-        givenARendererInflatingView(mockedView);
-
-        onCreateRenderer();
-
-        assertEquals(renderer.getPosition(), testPosition);
-    }
-
-    @Test
     public void shouldInflateViewUsingLayoutInflaterAndParentAfterOnCreateCall() {
         givenARendererInflatingView(mockedView);
 
@@ -72,7 +62,7 @@ public class RendererTest {
 
     @Test(expected = NotInflateViewException.class)
     public void shouldThrowExceptionIfInflateReturnsAnEmptyViewAfterOnCreateCall() {
-        givenARendererInflatingANullView();
+        givenArendererInflatingANullView();
 
         onCreateRenderer();
     }
@@ -104,17 +94,6 @@ public class RendererTest {
         assertEquals(mockedContent, renderer.getContent());
     }
 
-    @Test
-    public void shouldReturnNonNullContextAfterCreation() throws Exception {
-        givenARendererInflatingView(mockedView);
-        when(mockedParent.getContext()).thenReturn(mock(Context.class));
-        assertNull(renderer.getContext());
-
-        renderer.onCreate(mockedContent, mockedLayoutInflater, mockedParent);
-
-        assertNotNull(renderer.getContext());
-    }
-
     private void initializeRenderer() {
         renderer = new ObjectRenderer();
     }
@@ -125,18 +104,17 @@ public class RendererTest {
 
     private void onCreateRenderer() {
         renderer.onCreate(mockedContent, mockedLayoutInflater, mockedParent);
-        renderer.setPosition(testPosition);
     }
 
     private void onRecycleRenderer() {
         renderer.onRecycle(mockedContent);
     }
 
-    private void givenARendererInflatingANullView() {
+    private void givenArendererInflatingANullView() {
         givenARendererInflatingView(null);
     }
 
-    private void givenARendererInflatingView(@Nullable View view) {
+    private void givenARendererInflatingView(View view) {
         when(renderer.inflate(mockedLayoutInflater, mockedParent)).thenReturn(view);
     }
 }

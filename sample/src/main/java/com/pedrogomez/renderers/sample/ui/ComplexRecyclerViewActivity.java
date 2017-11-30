@@ -59,12 +59,12 @@ public class ComplexRecyclerViewActivity extends Activity {
 
         List<Video> videoCollection = RandomVideoCollectionGenerator.generateList(VIDEO_COUNT);
 
-        RendererAdapter adapter = RendererBuilder.create()
+        RendererBuilder rendererBuilder = new RendererBuilder()
               .bind(Video.class, new VideoRenderer())
               .bind(TYPE_FOOTER, new FooterRenderer())
-              .bind(TYPE_SECTION, new SectionRenderer2())
-              .build()
-              .into(recyclerView);
+              .bind(TYPE_SECTION, new SectionRenderer2());
+        RendererAdapter adapter = new RendererAdapter(rendererBuilder);
+        recyclerView.setAdapter(adapter);
 
         for (int i = 0, videoCollectionSize = videoCollection.size(); i < videoCollectionSize; i++) {
             adapter.add(new RendererContent<>("Video #" + (i + 1), TYPE_SECTION));

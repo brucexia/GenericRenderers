@@ -195,4 +195,16 @@ public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder>
     @SuppressWarnings("UnusedParameters")
     protected void updateRendererExtraValues(T content, Renderer renderer, int position) {
     }
+
+    @Override
+    public void onViewDetachedFromWindow(RendererViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.getRenderer().detachFromWindow();
+    }
+
+    @Override
+    public void onViewRecycled(RendererViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.getRenderer().unbind();
+    }
 }

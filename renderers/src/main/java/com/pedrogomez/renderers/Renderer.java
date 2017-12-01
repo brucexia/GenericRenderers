@@ -30,11 +30,11 @@ import java.util.List;
  * Core class in this library. Base class created to work as a root ViewHolder in the classic
  * ListView / Adapter implementation. This entity will be extended by other Renderer classes in
  * order to show items into the screen.
- *
+ * <p>
  * A Renderer have to encapsulate the presentation logic for ech row of your ListView/RecyclerView.
- *
+ * <p>
  * Every Renderer have inside the view is rendering and the content is using to get the info.
- *
+ * <p>
  * If you used to use RecyclerView extensions of this class are going to replace ViewHolder
  * implementations.
  *
@@ -50,17 +50,17 @@ public abstract class Renderer<T> implements Cloneable {
      * inflate the xml layout using the layoutInflater and the parent ViewGroup and call setUpView and
      * hookListeners methods.
      *
-     * @param content to render. If you are using Renderers with RecyclerView widget the content will
-     * be null in this method.
+     * @param content        to render. If you are using Renderers with RecyclerView widget the content will
+     *                       be null in this method.
      * @param layoutInflater used to inflate the view.
-     * @param parent used to inflate the view.
+     * @param parent         used to inflate the view.
      */
     public void onCreate(@Nullable T content, LayoutInflater layoutInflater, ViewGroup parent) {
         this.content = content;
         rootView = inflate(layoutInflater, parent);
         if (rootView == null) {
             throw new NotInflateViewException(
-                  "Renderer instances have to return a not null view in inflateView method");
+                    "Renderer instances have to return a not null view in inflateView method");
         }
         setUpView(rootView);
         hookListeners(rootView);
@@ -115,11 +115,11 @@ public abstract class Renderer<T> implements Cloneable {
     /**
      * Inflate renderer layout. The view inflated can't be null. If this method returns a null view a
      * NotInflateViewException will be thrown.
-     * <p />
+     * <p/>
      * <b>Please note that {@link #getContext()} will return null at this point.</b>
      *
      * @param inflater LayoutInflater service to inflate.
-     * @param parent view group associated to the current Renderer instance.
+     * @param parent   view group associated to the current Renderer instance.
      * @return View with the inflated layout.
      */
     protected abstract View inflate(LayoutInflater inflater, ViewGroup parent);
@@ -129,31 +129,35 @@ public abstract class Renderer<T> implements Cloneable {
      *
      * @param rootView inflated using previously.
      */
-    protected void setUpView(View rootView) { }
+    protected void setUpView(View rootView) {
+    }
 
     /**
      * Set all the listeners to members mapped in setUpView method.
      *
      * @param rootView inflated using previously.
      */
-    protected  void hookListeners(View rootView) { }
+    protected void hookListeners(View rootView) {
+    }
 
     /**
      * Method where the presentation logic algorithm have to be declared or implemented.
+     *
      * @param payloads Extra payloads for fine-grain rendering.
      */
     public abstract void render(List<Object> payloads);
+
     public void render(List<Object> payloads, int position, RecyclerView.ViewHolder holder) {
         render(payloads);
     }
 
-        /**
-         * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
-         * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
-         * method in Renderer subtypes.
-         *
-         * @return a copy of the current renderer.
-         */
+    /**
+     * Create a clone of the Renderer. This method is the base of the prototype mechanism implemented
+     * to avoid create new objects from RendererBuilder. Pay an special attention implementing clone
+     * method in Renderer subtypes.
+     *
+     * @return a copy of the current renderer.
+     */
     Renderer<T> copy() {
         try {
             //noinspection unchecked
@@ -161,5 +165,11 @@ public abstract class Renderer<T> implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("All your renderers should be clonables.");
         }
+    }
+
+    public void unbind() {
+    }
+
+    public void detachFromWindow() {
     }
 }

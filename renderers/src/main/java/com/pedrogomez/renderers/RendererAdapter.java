@@ -43,7 +43,7 @@ import java.util.List;
 public class RendererAdapter<T> extends RecyclerView.Adapter<RendererViewHolder> {
 
     private final RendererBuilder<T> rendererBuilder;
-    private final List<T> collection;
+    protected List<T> collection;
 
     public RendererAdapter(RendererBuilder rendererBuilder) {
         this(rendererBuilder, new ArrayList());
